@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->integer('target_stock_qty');
             $table->string('unit');
-            $table->string('capacity');
-            $table->unsignedTinyInteger('storage_location');
+            $table->string('capacity')->nullable();
+            $table->string('storage_location');
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
