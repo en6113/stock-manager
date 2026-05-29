@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-app-layout>
     <div class="container mx-auto px-4 sm:px-8 max-w-5xl py-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
@@ -101,4 +101,4 @@
             </table>
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>

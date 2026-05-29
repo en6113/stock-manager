@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-app-layout>
     <div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
         <div class="relative py-3 sm:max-w-xl sm:mx-auto">
             <div class="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
@@ -24,16 +24,40 @@
 
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
+                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', $item->target_stock_qty) }}"
+                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
+                                </div>
+                                <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">単位</label>
+                                    <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
+                                        required>
+                                        <option value="g" {{ $item->unit == 'g' ? 'selected' : '' }}>g</option>
+                                        <option value="kg" {{ $item->unit == 'kg' ? 'selected' : '' }}>kg</option>
+                                        <option value="ml" {{ $item->unit == 'ml' ? 'selected' : '' }}>ml</option>
+                                        <option value="L" {{ $item->unit == 'L' ? 'selected' : '' }}>L</option>
+                                        <option value="個" {{ $item->unit == '個' ? 'selected' : '' }}>個</option>
+                                        <option value="本" {{ $item->unit == '本' ? 'selected' : '' }}>本</option>
+                                        <option value="パック" {{ $item->unit == 'パック' ? 'selected' : '' }}>パック</option>
+                                        <option value="ケース" {{ $item->unit == 'ケース' ? 'selected' : '' }}>ケース</option>
+                                        <option value="尾" {{ $item->unit == '尾' ? 'selected' : '' }}>尾</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">規格容量</label>
+                                    <input type="text" name="capacity" value="{{ old('capacity', $item->capacity) }}"
+                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" placeholder="例：1kg/本">
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col md:flex-row gap-4">
+                                <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">保管場所</label>
                                     <select name="storage_location" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
                                         <option value="常温" {{ $item->storage_location == '常温' ? 'selected' : '' }}>常温パントリー</option>
                                         <option value="冷蔵" {{ $item->storage_location == '冷蔵' ? 'selected' : '' }}>冷蔵庫</option>
                                         <option value="冷凍" {{ $item->storage_location == '冷凍' ? 'selected' : '' }}>冷凍庫</option>
                                     </select>
-                                </div>
-                                <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
-                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', $item->target_stock_qty) }}" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
                                 </div>
                             </div>
 
@@ -71,4 +95,4 @@
             </div>
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>

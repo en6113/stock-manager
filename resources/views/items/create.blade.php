@@ -1,4 +1,4 @@
-<x-guest-layout> {{-- Fortifyのレイアウトに合わせる、又は既存の共通レイアウトに変更してください --}}
+<x-app-layout>
     <div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
         <div class="relative py-3 sm:max-w-xl sm:mx-auto">
             <div class="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
@@ -26,6 +26,35 @@
 
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
+                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', 1) }}"
+                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
+                                </div>
+                                <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">単位</label>
+                                    <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
+                                        <option value="">選択してください</option>
+                                        <option value="g">g</option>
+                                        <option value="kg">kg</option>
+                                        <option value="ml">ml</option>
+                                        <option value="L">L</option>
+                                        <option value="個">個</option>
+                                        <option value="本">本</option>
+                                        <option value="パック">パック</option>
+                                        <option value="ケース">ケース</option>
+                                        <option value="尾">尾</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col flex-1">
+                                    <label class="leading-loose text-sm font-medium">規格容量</label>
+                                    <input type="text" name="capacity" value="{{ old('capacity') }}"
+                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
+                                        placeholder="例：1kg/本">
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">保管場所</label>
                                     <select name="storage_location"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
@@ -33,13 +62,6 @@
                                         <option value="冷蔵">冷蔵庫</option>
                                         <option value="冷凍">冷凍庫</option>
                                     </select>
-                                </div>
-                                <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
-                                    <input type="number" name="target_stock_qty"
-                                        value="{{ old('target_stock_qty', 1) }}"
-                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
-                                        min="0" required>
                                 </div>
                             </div>
 
@@ -59,7 +81,7 @@
                                 <div class="grid grid-cols-2 gap-2 mt-1">
                                     @foreach($allergens as $allergen)
                                         <label class="inline-flex items-center text-sm text-gray-600">
-                                            <input type="checkbox" name="allergens[]" value="{{ $allergen->id }}"
+                                            <input type="checkbox" name="allergen_ids[]" value="{{ $allergen->id }}"
                                                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                             <span class="ml-2">{{ $allergen->name }}</span>
                                         </label>
@@ -79,4 +101,4 @@
             </div>
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>
