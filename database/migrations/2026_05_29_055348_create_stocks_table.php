@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
-            $table->integer('stock');
             $table->integer('qty');
-            $table->string('unit');
-            $table->string('capacity');
+            $table->integer('stock');
             $table->integer('reserved_qty');
             $table->date('expiration_date');
             $table->string('lot_number')->nullable();

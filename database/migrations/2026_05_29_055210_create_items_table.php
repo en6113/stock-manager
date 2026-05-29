@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->integer('target_stock_qty');
+            $table->string('unit');
+            $table->string('capacity');
             $table->unsignedTinyInteger('storage_location');
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
