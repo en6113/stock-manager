@@ -20,7 +20,7 @@ class Item extends Model
     /**
      * このアイテムを販売する業者を取得
      */
-    public function vendors(): belongsTo
+    public function vendors(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }

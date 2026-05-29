@@ -23,7 +23,7 @@ class Stock extends Model
     /**
      * この在庫管理に属する商品を取得
      */
-    public function items(): belongsTo
+    public function items(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
