@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('address');
-            $table->string('phone_number',11);
+            $table->string('phone_number', 11);
             $table->string('contact_person');
             $table->string('product_category');
             $table->timestamps();
