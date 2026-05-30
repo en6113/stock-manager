@@ -16,8 +16,7 @@ class ItemController extends Controller
     {
         $items = Item::all();
 
-        return '食材一覧画面（準備中）';
-        // return view('items.index', compact('items'));
+         return view('items.index', compact('items'));
     }
 
     /**

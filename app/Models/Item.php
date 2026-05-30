@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -33,6 +34,22 @@ class Item extends Model
      */
     public function allergens(): BelongsToMany
     {
-        return $this->belongsToMany(Allergen::class);
+        return $this->belongsToMany(Allergen::class,'allergen_item');
+    }
+
+    /**
+     * このアイテムが属するメニューを取得
+     */
+    public function menus(): belongsToMany
+    {
+        return $this->belongsToMany(Menu::class,'item_menu');
+    }
+
+    /**
+     * このアイテムの在庫を取得
+     */
+    public function stock(): HasOne
+    {
+        return $this->hasOne(Stock::class);
     }
 }
