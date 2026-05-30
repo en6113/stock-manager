@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relation\BelongsTo;
@@ -23,7 +24,7 @@ class Stock extends Model
     /**
      * この在庫管理に属する商品を取得
      */
-    public function items(): BelongsTo
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }

@@ -22,6 +22,20 @@
                                 @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
 
+                            <div class="flex flex-col">
+                                <label class="leading-loose text-sm font-medium">種類</label>
+                                <select name="item_category" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
+                                    <option value="野菜類" {{ $item->item_category == '野菜類（いも類含む）' ? 'selected' : '' }}>野菜類（いも類含む）</option>
+                                    <option value="肉類" {{ $item->item_category == '肉類' ? 'selected' : '' }}>肉類</option>
+                                    <option value="魚介類" {{ $item->item_category == '魚介類' ? 'selected' : '' }}>魚介類</option>
+                                    <option value="卵類" {{ $item->item_category == '卵類' ? 'selected' : '' }}>卵類</option>
+                                    <option value="きのこ・海藻類" {{ $item->item_category == 'きのこ・海藻類' ? 'selected' : '' }}>きのこ・海藻類</option>
+                                    <option value="加工食品" {{ $item->item_category == '加工食品' ? 'selected' : '' }}>加工食品（調味料含む）</option>
+                                    <option value="果実類" {{ $item->item_category == '果実類' ? 'selected' : '' }}>果実類</option>
+                                    <option value="その他" {{ $item->item_category == 'その他' ? 'selected' : '' }}>その他</option>
+                                </select>
+                            </div>
+
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
@@ -44,7 +58,7 @@
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">規格容量</label>
+                                    <label class="leading-loose text-sm font-medium">規格容量（単位の補足）</label>
                                     <input type="text" name="capacity" value="{{ old('capacity', $item->capacity) }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" placeholder="例：1kg/本">
                                 </div>

@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             VendorSeeder::class,
             AllergenSeeder::class,
+            MenuSeeder::class,
+            ItemSeeder::class,
+            MealPlanSeeder::class,
         ]);
     }
 }

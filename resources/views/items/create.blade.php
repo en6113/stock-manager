@@ -24,10 +24,25 @@
                                 @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
 
+                            <div class="flex flex-col">
+                                <label class="leading-loose text-sm font-medium">種類</label>
+                                <select name="item_category" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
+                                        <option value="">選択してください</option>
+                                        <option value="野菜類">野菜類（いも類含む）</option>
+                                        <option value="肉類">肉類</option>
+                                        <option value="魚介類">魚介類</option>
+                                        <option value="卵類">卵類</option>
+                                        <option value="きのこ・海藻類">きのこ・海藻類</option>
+                                        <option value="加工食品">加工食品（調味料含む）</option>
+                                        <option value="果実類">果実類</option>
+                                        <option value="その他">その他</option>
+                                    </select>
+                            </div>
+
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
-                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', 1) }}"
+                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', 0) }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
                                 </div>
                                 <div class="flex flex-col flex-1">
@@ -46,7 +61,7 @@
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">規格容量</label>
+                                    <label class="leading-loose text-sm font-medium">規格容量(単位の補足)</label>
                                     <input type="text" name="capacity" value="{{ old('capacity') }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
                                         placeholder="例：1kg/本">
