@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             ItemSeeder::class,
             MealPlanSeeder::class,
+            StockSeeder::class,
         ]);
     }
 }

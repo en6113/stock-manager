@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relation\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Stock extends Model
 {
@@ -13,12 +13,14 @@ class Stock extends Model
 
     protected $fillable = [
         'item_id',
-        'qty',
         'stock',
-        'reserved_qty',
+        'status',
+        'ordered_qty',
+        'ordered_date',
+        'vendor_id',
+        'received_date',
         'expiration_date',
         'lot_number',
-        'delivery_date',
     ];
 
     /**
@@ -27,5 +29,13 @@ class Stock extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    /**
+     * この在庫管理に属する発注業者を取得
+     */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
     }
 }

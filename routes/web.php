@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MealPlanController;
 use Illuminate\Support\Facades\Route;
-use const Dom\INDEX_SIZE_ERR;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -11,7 +12,9 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
 
-    Route::resource('stocks', StockController::class)->only('index','show','store','update');
+    Route::resource('stocks', StockController::class)->only('index','store','edit','update');
 
     Route::resource('items', ItemController::class);
+    Route::resource('menus', MenuController::class);
+    Route::resource('meal_plans', MealPlanController::class);
 });
