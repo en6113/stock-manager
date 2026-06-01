@@ -23,10 +23,13 @@ class StockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'qty' => 'integer',
-            'stock' => 'integer',
-            'reserved_qty' => 'integer',
-            'expiration_date' => 'date',
+            'stock' => 'required|integer|min:0',
+            'status' => 'required|string|between:0,2',
+            'ordered_qty' => 'nullable|integer',
+            'ordered_date' => 'nullable|date',
+            'vendor_id' => 'integer|exists:vendors,id',
+            'received_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
             'lot_number' => 'nullable|string',
         ];
     }
