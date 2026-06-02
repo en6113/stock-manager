@@ -21,25 +21,19 @@ class StockController extends Controller
                       ->where('meal_plans.date', '>=', now()->toDateString());
             }], 'item_menu.required_amount')->get();
 
-        //ゆくゆくは$stockを食材の発注数(orders.qty)-調理済のメニューの必要量(reserved_qty)で自動計算するように変更予定
+        // 在庫数(stock)を食材の発注数(ordered.qty)-調理済メニュー量(reserved_qty)で自動計算するようにしたい
 
         return view('stocks.index',compact('items'));
     }
 
     /**
-     * 在庫編集画面の表示
+     * 在庫新規登録
      */
-    public function edit(Stock $stock)
+    public function store(StockRequest $request)
     {
-        // item_id に紐づく全てのstockデータを取得し、発注順で並べる
-        $stocks = Stock::with('item')
-            ->where('item_id', $stock->item_id)
-            ->orderBy('ordered_date', 'desc')
-            ->get();
+        Stock::create($request->validated());
 
-        $item = $stock->item;
-
-        return view('stocks.edit', compact('stocks','item'));
+        return redirect()->route('stocks.index')->with('success', '在庫を更新しました。');
     }
 
     /**

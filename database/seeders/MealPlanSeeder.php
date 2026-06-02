@@ -19,7 +19,7 @@ class MealPlanSeeder extends Seeder
         $salad = Menu::where('name', 'ツナマヨコーンサラダ')->first();
 
         $mealPlan = MealPlan::forceCreate([
-            'date' => Carbon::create(2026, 6, 1)->format('Y-m-d'),
+            'date' => Carbon::create(2026, 6, 30)->format('Y-m-d'),
         ]);
 
         // 中間テーブル（meal_plan_menu）にメニューのIDを紐付ける

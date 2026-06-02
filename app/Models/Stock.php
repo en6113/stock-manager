@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Item;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,14 +14,8 @@ class Stock extends Model
 
     protected $fillable = [
         'item_id',
+        'order_id',
         'stock',
-        'status',
-        'ordered_qty',
-        'ordered_date',
-        'vendor_id',
-        'received_date',
-        'expiration_date',
-        'lot_number',
     ];
 
     /**
@@ -32,10 +27,10 @@ class Stock extends Model
     }
 
     /**
-     * この在庫管理に属する発注業者を取得
+     * この在庫管理に属する発注歴を取得
      */
-    public function vendor(): BelongsTo
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Order::class);
     }
 }

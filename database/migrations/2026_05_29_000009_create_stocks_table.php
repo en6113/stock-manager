@@ -14,14 +14,7 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
-            $table->integer('stock')->default(0); // 在庫数
-            $table->string('status')->default('pending'); // 'pending': 未発注, 'ordered': 発注済, 'received': 納品済
-            $table->integer('ordered_qty')->default(0); // 発注中数量
-            $table->date('ordered_date')->nullable();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete()->nullable();
-            $table->date('received_date')->nullable();
-            $table->date('expiration_date')->nullable();
-            $table->string('lot_number')->nullable();
+            $table->integer('stock')->default(0);
             $table->timestamps();
         });
     }
