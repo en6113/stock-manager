@@ -15,6 +15,12 @@
                     <a href="{{ route('meal_plans.index') }}" class="text-gray-300 hover:text-white">
                         献立一覧
                     </a>
+                    <a href="{{ route('items.index') }}" class="text-gray-300 hover:text-white">
+                        食材一覧
+                    </a>
+                    <a href="{{ route('orders.index') }}" class="text-gray-300 hover:text-white">
+                        発注履歴
+                    </a>
                     <span class="text-gray-300">
                         {{ auth()->user()->name }}さん
                     </span>

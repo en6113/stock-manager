@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\MenuController;
@@ -17,4 +18,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('items', ItemController::class);
     Route::resource('menus', MenuController::class);
     Route::resource('meal_plans', MealPlanController::class);
+    Route::resource('orders', OrderController::class);
 });

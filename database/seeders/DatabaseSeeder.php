@@ -16,8 +16,9 @@ class DatabaseSeeder extends Seeder
             VendorSeeder::class,
             AllergenSeeder::class,
             MenuSeeder::class,
-            ItemSeeder::class,
             MealPlanSeeder::class,
+            ItemSeeder::class,
+            OrderSeeder::class,
             StockSeeder::class,
         ]);
     }

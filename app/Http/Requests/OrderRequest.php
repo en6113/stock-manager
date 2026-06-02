@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Stock;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StockRequest extends FormRequest
+class OrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +22,12 @@ class StockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stock' => 'required|integer|min:0',
+            'ordered_qty' => 'nullable|integer',
+            'ordered_date' => 'nullable|date',
+            'vendor_id' => 'integer|exists:vendors,id',
+            'received_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
+            'lot_number' => 'nullable|string',
         ];
     }
 }
