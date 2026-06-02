@@ -9,8 +9,8 @@
             {{-- ナビゲーションリンク --}}
             <div class="flex items-center space-x-4">
                 @auth
-                    <a href="{{ route('menus.create') }}" class="text-gray-300 hover:text-white">
-                        メニュー登録
+                    <a href="{{ route('menus.index') }}" class="text-gray-300 hover:text-white">
+                        メニュー一覧
                     </a>
                     <a href="{{ route('meal_plans.index') }}" class="text-gray-300 hover:text-white">
                         献立一覧

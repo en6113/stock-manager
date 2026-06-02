@@ -23,6 +23,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '冷蔵',
                 'vendor_id' => 3,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 3,
             ],
             [
@@ -34,6 +35,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 2,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 12,
             ],
             [
@@ -44,6 +46,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 2,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 8,
             ],
             [
@@ -54,6 +57,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 2,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 15,
             ],
             [
@@ -63,6 +67,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 1,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 4,
             ],
             [
@@ -74,6 +79,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 1,
                 'menu_id' => 1,
+                'servings' => 50,
                 'required_amount' => 45,
             ],
             [
@@ -84,6 +90,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 2,
                 'menu_id' => 2,
+                'servings' => 50,
                 'required_amount' => 5,
             ],
             [
@@ -95,6 +102,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 1,
                 'menu_id' => 2,
+                'servings' => 50,
                 'required_amount' => 4,
             ],
             [
@@ -105,6 +113,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '常温',
                 'vendor_id' => 1,
                 'menu_id' => 2,
+                'servings' => 50,
                 'required_amount' => 2,
             ],
             [
@@ -116,6 +125,7 @@ class ItemSeeder extends Seeder
                 'storage_location' => '冷蔵',
                 'vendor_id' => 1,
                 'menu_id' => 2,
+                'servings' => 50,
                 'required_amount' => 1,
             ],
             [
@@ -128,6 +138,7 @@ class ItemSeeder extends Seeder
                 'vendor_id' => 1,
                 'allergens' => ['卵', '乳'],
                 'menu_id' => 2,
+                'servings' => 50,
                 'required_amount' => 1,
             ],
         ];
@@ -159,10 +170,11 @@ class ItemSeeder extends Seeder
 
             // メニューと必要分量を中間テーブルに保存
             $menu_id = $data['menu_id'] ?? null;
+            $servings = $data['servings'] ?? null;
             $required_amount = $data['required_amount'] ?? [];
 
-            if (!is_null($menu_id) && !is_null($required_amount)) {
-                $item->menus()->attach([$menu_id => ['required_amount' => $required_amount]]);
+            if (!is_null($menu_id) && !is_null($servings)&& !is_null($required_amount)) {
+                $item->menus()->attach([$menu_id => ['servings' => $servings, 'required_amount' => $required_amount]]);
             }
         }
     }
