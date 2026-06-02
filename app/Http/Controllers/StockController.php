@@ -33,7 +33,7 @@ class StockController extends Controller
     {
         Stock::create($request->validated());
 
-        return redirect()->route('stocks.index')->with('success', '在庫を更新しました。');
+        return redirect()->route('stocks.index')->with('success', '在庫を登録しました。');
     }
 
     /**

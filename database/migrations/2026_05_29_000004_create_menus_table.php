@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedTinyInteger('dish_category');
+            $table->integer('dish_category');
             $table->integer('calorie')->nullable();
             $table->timestamps();
         });
