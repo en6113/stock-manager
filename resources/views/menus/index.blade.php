@@ -12,19 +12,24 @@
                 <form action="{{ route('menus.index') }}" method="GET" class="bg-gray-50 p-4 rounded mb-6 flex flex-wrap gap-4 items-end">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">メニュー名検索</label>
-                        <input type="text" name="search" class="mt-1 block rounded border-gray-300 p-2 bg-white" placeholder="キーワード">
+                        <input type="text" name="keyword" value="{{ request('keyword') }}" class="mt-1 block rounded border-gray-300 p-2 bg-white" placeholder="キーワード">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
-                        <select name="filter_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
+                        <select name="dish_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
                             <option value="">すべて</option>
-                            <option value="1">主菜</option>
-                            <option value="2">副菜</option>
-                            <option value="3">汁物</option>
-                            <option value="4">おやつ</option>
+                            <option value="1" {{ request('category_id') == '1' ? 'selected' : '' }}>主菜</option>
+                            <option value="2" {{ request('category_id') == '2' ? 'selected' : '' }}>副菜</option>
+                            <option value="3" {{ request('category_id') == '3' ? 'selected' : '' }}>汁物</option>
+                            <option value="4" {{ request('category_id') == '4' ? 'selected' : '' }}>おやつ</option>
                         </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">検索</button>
+                    <div>
+                        <a href="{{ route('menus.index') }}" class="px-4 py-2 bg-[#e8ddd2] text-[#9a938c] rounded hover:bg-[#ddd2c7] inline-block">
+                            リセット
+                        </a>
+                    </div>
                 </form>
 
                 <div class="overflow-x-auto">
@@ -68,6 +73,11 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <!-- ページネーション -->
+                <div class="flex items-center">
+                    {{ $menus->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>

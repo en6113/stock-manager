@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <title>メニュー編集</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
+<x-app-layout>
 
 <body class="bg-gray-50 p-8">
     <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
@@ -51,34 +44,44 @@
 
                 <div id="item-container" class="space-y-3">
                     @forelse($menu->items as $pivotItem)
-                        <div class="flex gap-4 items-center item-row bg-gray-50 p-3 rounded">
-                            <div class="flex-1">
+
+                        <div class="flex gap-4 items-end item-row bg-gray-50 p-3 rounded">
+                            <div class="flex-1 max-w-md">
                                 <label class="block text-xs font-medium text-gray-600">アイテム（検索）</label>
-                                <input list="item-list" name="item_ids[]" value="{{ $pivotItem->id }}"
+                                <input list="item-list" name="item_ids[]" value="{{ $pivotItem->name }}"
                                     class="mt-1 block w-full rounded border-gray-300 p-1.5 bg-white shadow-sm">
                             </div>
-                            <div class="w-32">
-                                <label class="block text-xs font-medium text-gray-600">必要量 (g/ml)</label>
-                                <input type="number" name="required_amounts[]"
-                                    value="{{ $pivotItem->pivot->required_amount }}"
-                                    class="mt-1 block w-full rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1">
+
+                            <div class="w-48">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">必要量</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" name="required_amounts[]"
+                                        value="{{ old('required_amounts.' . $loop->index, $pivotItem->pivot->required_amount) }}"
+                                        class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1" step="0.1">
+                                    <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]">
+                                        {{ $pivotItem->unit }}
+                                    </span>
+                                </div>
                             </div>
+
                             <div class="pt-4">
-                                <button type="button"
-                                    class="remove-btn text-red-500 hover:text-red-700 font-bold">削除</button>
+                                <button type="button" class="remove-btn text-red-500 hover:text-red-700 font-bold">削除</button>
                             </div>
                         </div>
                     @empty
                         <div class="flex gap-4 items-center item-row bg-gray-50 p-3 rounded">
-                            <div class="flex-1">
+                            <div class="flex-1 max-w-md">
                                 <label class="block text-xs font-medium text-gray-600">アイテム（検索）</label>
                                 <input list="item-list" name="item_ids[]"
                                     class="mt-1 block w-full rounded border-gray-300 p-1.5 bg-white shadow-sm">
                             </div>
-                            <div class="w-32">
-                                <label class="block text-xs font-medium text-gray-600">必要量 (g/ml)</label>
-                                <input type="number" name="required_amounts[]"
-                                    class="mt-1 block w-full rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1">
+                            <div class="w-48">
+                                <label class="block text-xs font-medium text-gray-600">必要量 </label>
+                                    <div class="flex items-center gap-2"></div>
+                                        <input type="number" name="required_amounts[]"
+                                            class="mt-1 block w-full rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1" step="0.1">
+                                        <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]"></span>
+                                    </div>
                             </div>
                             <div class="pt-4">
                                 <button type="button"
@@ -90,7 +93,7 @@
 
                 <datalist id="item-list">
                     @foreach($registered_items as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        <option value="{{ $item->name }}" data-id="{{ $item->id }}" data-unit="{{ $item->unit }}">ID:{{ $item->id }}</option>
                     @endforeach
                 </datalist>
 
@@ -110,6 +113,20 @@
     </div>
 
     <script>
+        document.getElementById('item-container').addEventListener('input', function (e) {
+                if (e.target.name === 'item_ids[]') {
+                    const input = e.target;
+                    const selectedValue = input.value; 
+                    const option = document.querySelector(`#item-list option[value="${selectedValue}"]`);
+                    const unitSpan = input.closest('.item-row').querySelector('.unit-display');
+
+                    if (option) {
+                        unitSpan.textContent = option.dataset.unit;
+                    } else {
+                        unitSpan.textContent = '';
+                    }
+                }
+            });
         document.getElementById('add-item-btn').addEventListener('click', function () {
             const container = document.getElementById('item-container');
             const firstRow = container.querySelector('.item-row');
@@ -138,4 +155,4 @@
     </script>
 </body>
 
-</html>
+</x-app-layout>

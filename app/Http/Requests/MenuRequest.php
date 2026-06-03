@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Item;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MenuRequest extends FormRequest
@@ -22,12 +23,12 @@ class MenuRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'dish_category' => 'required|integer',
             'calories' => 'nullable|integer',
             'item_name.*' => 'required|string',
             'servings' => 'required|integer',
-            'required_amounts.*' => 'required_with:item_name.*|nullable|integer|min:0.1',
+            'required_amounts.*' => 'required_with:item_name.*|nullable|numeric|min:0.1',
         ];
     }
 
@@ -40,5 +41,43 @@ class MenuRequest extends FormRequest
             'servings.required' => '何人分を想定しているかを入力してください。',
             'required_amount.required' => '必要量を入力してください',
         ];
+    }
+
+    /**
+     * 中間テーブルにデータをsyncするためのロジック
+     */
+    public function getSyncData(): array
+    {
+        // 送られてきたアイテム名の一覧をコレクション化し、空の要素を除外
+        $itemNames = collect($this->input('item_ids', []))->filter();
+
+        if ($itemNames->isEmpty()) {
+            return [];
+        }
+
+        // DBへのクエリを発行し、名前をキーにした連想配列にする
+        $items = Item::whereIn('name', $itemNames)->get()->keyBy('name');
+
+        $requiredAmounts = $this->input('required_amounts', []);
+        $servings = $this->input('servings');
+
+        $syncData = [];
+
+        foreach ($this->input('item_ids', []) as $key => $itemName) {
+            // 空白の入力枠は無視するロジック（エラー防止）
+            if (empty($itemName) || !$items->has($itemName)) {
+                continue;
+            }
+
+            $item = $items->get($itemName);
+            $amount = $requiredAmounts[$key] ?? 0;
+
+            $syncData[$item->id] = [
+                'servings' => $servings,
+                'required_amount' => $amount,
+            ];
+        }
+
+        return $syncData;
     }
 }

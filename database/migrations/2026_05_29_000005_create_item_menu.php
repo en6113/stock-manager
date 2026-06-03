@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
             $table->foreignId('menu_id')->constrained()->cascadeOnDelete();
             $table->integer('servings')->default(1);
-            $table->integer('required_amount');
+            $table->decimal('required_amount', 8, 1);
             $table->timestamps();
         });
     }
