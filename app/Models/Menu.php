@@ -23,7 +23,8 @@ class Menu extends Model
     // このメニューに属する食材を取得
     public function items() : BelongsToMany
     {
-        return $this->belongsToMany(Item::class,'item_menu', 'menu_id', 'item_id');
+        return $this->belongsToMany(Item::class,'item_menu', 'menu_id', 'item_id')
+            ->withPivot('required_amount');
     }
 
     /**
