@@ -61,7 +61,7 @@
                                 <div class="w-48"> <label class="block text-xs font-medium text-gray-600 mb-1">必要量</label>
                                     <div class="flex items-center gap-2">
                                         <input type="number" name="required_amounts[]"
-                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1">
+                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1" step="0.1">
                                         <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]"></span>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@
                                 <div class="w-48"> <label class="block text-xs font-medium text-gray-600 mb-1">必要量</label>
                                     <div class="flex items-center gap-2">
                                         <input type="number" name="required_amounts[]"
-                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1">
+                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="1" step="0.1">
                                         <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]"></span>
                                     </div>
                                 </div>

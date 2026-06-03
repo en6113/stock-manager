@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Item;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ class Menu extends Model
 
     protected $fillable = [
         'id',
-        'menu',
+        'name',
         'dish_category',
         'calorie',
     ];
@@ -23,6 +24,32 @@ class Menu extends Model
     public function items() : BelongsToMany
     {
         return $this->belongsToMany(Item::class,'item_menu', 'menu_id', 'item_id');
+    }
+
+    /**
+     * キーワード検索スコープ
+     */
+    public function scopeKeywordSearch(Builder $query, ?string $keyword): Builder
+    {
+        if (blank($keyword)) { // blank():値が空文字やnullの場合にクエリをそのまま返す
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($keyword) {
+            $q->where('name', 'like', '%' . $keyword . '%');
+        });
+    }
+
+    /**
+     * カテゴリー検索スコープ
+     */
+    public function scopeCategorySearch(Builder $query, ?int $dishCategory): Builder
+    {
+        if (blank($dishCategory)) {
+            return $query;
+        }
+
+        return $query->where('dish_category', $dishCategory);
     }
 
     // カテゴリを数値から文字列に変換するアクセサ

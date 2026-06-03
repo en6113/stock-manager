@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Menu;
+use App\Http\Requests\IndexMenuRequest;
 use App\Http\Requests\MenuRequest;
 
 class MenuController extends Controller
@@ -11,9 +12,12 @@ class MenuController extends Controller
     /**
      * メニュー一覧
      */
-    public function index()
+    public function index(IndexMenuRequest $request)
     {
-        $menus = Menu::withCount('items')->get();
+        $menus = Menu::withCount('items')
+            ->keywordSearch($request->keyword)
+            ->categorySearch($request->dish_category)
+            ->paginate(10);
 
         return view('menus.index', compact('menus'));
     }
@@ -35,58 +39,48 @@ class MenuController extends Controller
     {
         $menu = Menu::create($request->validated());
 
-        $syncData = [];
-
-        foreach ($request->input('item_ids', []) as $key => $itemName) {
-            // 空白の入力枠は無視するロジック（エラー防止）
-            if (empty($itemName)) {
-                continue;
-            }
-
-            // $itemName を使ってItemを探す
-            $item = Item::where('name', $itemName)->first();
-
-            if ($item) {
-                // 「必要量」の配列から、同じ番号（$key）のデータを取り出す
-                $amount = $request->input('required_amounts')[$key] ?? 0;
-
-                $servings = $request->input('servings');
-
-                // sync用の配列に【食材ID】をキーにしてデータを詰め込む
-                $syncData[$item->id] = [
-                    'servings' => $servings,
-                    'required_amount' => $amount
-                ];
-            }
-        }
-
-        // 中間テーブルに保存
+        $syncData = $request->getSyncData();
         $menu->items()->sync($syncData);
-        
+
         return redirect()->route('menus.index')->with('success', 'メニューを登録しました。');
     }
 
     /**
      * メニュー編集画面を表示
      */
-    public function edit(string $id)
+    public function edit(Menu $menu)
     {
-        //
+        $menu->load([
+            'items' => function ($query) {
+                $query->withPivot('servings', 'required_amount');
+            }
+        ]);
+        
+        $registered_items = Item::all();
+
+        return view('menus.edit', compact('menu', 'registered_items'));
     }
 
     /**
      * メニューを更新
      */
-    public function update(Request $request, string $id)
+    public function update(MenuRequest $request, Menu $menu)
     {
-        //
+        $menu->update($request->validated());
+
+        $syncData = $request->getSyncData();
+        $menu->items()->sync($syncData);
+
+        return redirect()->route('menus.index')->with('success', 'メニューを更新しました。');
     }
 
     /**
      * メニューを削除
      */
-    public function destroy(string $id)
+    public function destroy(Menu $menu)
     {
-        //
+        $menu->delete();
+
+        return redirect()->route('menus.index')->with('success', 'メニューを削除しました。');
     }
 }
