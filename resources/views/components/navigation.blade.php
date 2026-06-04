@@ -9,14 +9,14 @@
             {{-- ナビゲーションリンク --}}
             <div class="flex items-center space-x-4">
                 @auth
-                    <a href="{{ route('menus.index') }}" class="text-gray-300 hover:text-white">
-                        メニュー一覧
-                    </a>
                     <a href="{{ route('meal_plans.index') }}" class="text-gray-300 hover:text-white">
                         献立一覧
                     </a>
+                    <a href="{{ route('menus.index') }}" class="text-gray-300 hover:text-white">
+                        メニュー一覧
+                    </a>
                     <a href="{{ route('items.index') }}" class="text-gray-300 hover:text-white">
-                        食材一覧
+                        食材詳細
                     </a>
                     <a href="{{ route('orders.index') }}" class="text-gray-300 hover:text-white">
                         発注履歴
