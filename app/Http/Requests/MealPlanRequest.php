@@ -26,4 +26,24 @@ class MealPlanRequest extends FormRequest
             'date' => 'nullable|date',
         ];
     }
+
+    // 中間テーブルにデータを保存するためにデータを成型(@storeと@updateで使用)
+    public function getFormattedMenuData(): array
+    {
+        $formatted = [];
+
+        foreach ($this->input('menus', []) as $categoryId => $menuData) {
+            // メニューが選択されていないカテゴリは無視
+            if (empty($menuData['menu_id'])) {
+                continue;
+            }
+
+            $formatted[] = [
+                'menu_id' => $menuData['menu_id'],
+                'ingredients' => $menuData['ingredients'] ?? [] // 調整後の食材の配列
+            ];
+        }
+
+        return $formatted;
+    }
 }

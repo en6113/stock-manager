@@ -77,38 +77,13 @@ class MealPlanController extends Controller
      */
     public function store(MealPlanRequest $request)
     {
-        \DB::transaction(function () use ($request) {
+        $mealPlan = \DB::transaction(function () use ($request) {
+            $mealPlan = MealPlan::create($request->validated());
+            
+            $syncData = $request->getFormattedMenuData(); // リクエストでデータを成型
+            $mealPlan->syncMenusAndIngredients($syncData); // モデルに中間テーブルへの保存ロジックあり
 
-            $mealPlan = MealPlan::create([
-                'date' => $request->input('date'),
-            ]);
-
-            foreach ($request->input('menus', []) as $catId => $menuData) {
-                // メニューが選択されていないカテゴリはスキップ
-                if (empty($menuData['menu_id'])) {
-                    continue;
-                }
-
-                // 中間テーブル(meal_plan_menu)にmenu_idを保存
-                $mealPlan->menus()->attach($menuData['menu_id']);
-
-                // meal_plan_menu_idを取得する
-                $mealPlanMenuId = \DB::table('meal_plan_menu')
-                    ->where('meal_plan_id', $mealPlan->id)
-                    ->where('menu_id', $menuData['menu_id'])
-                    ->value('id');
-
-                // 中間テーブル（meal_plan_menu_item）に調整後の食材とその必要量を保存
-                if (!empty($menuData['ingredients'])) {
-                    foreach ($menuData['ingredients'] as $ingredient) {
-                        MealPlanMenuItem::create([
-                            'meal_plan_menu_id' => $mealPlanMenuId,
-                            'item_id'           => $ingredient['item_id'],
-                            'adjust_amount'     => $ingredient['required_amount'],
-                        ]);
-                    }
-                }
-            }
+            return $mealPlan;
         });
 
     return redirect()->route('meal_plans.index')->with('success', '献立を登録しました！');
@@ -151,14 +126,12 @@ class MealPlanController extends Controller
      */
     public function update(MealPlanRequest $request, MealPlan $mealPlan)
     {
-        $mealPlan->update($request->validated());
+        \DB::transaction(function () use ($request, $mealPlan) {
+            $mealPlan->update($request->validated());
 
-        $MenuSyncData = $request->getMenuSyncData();
-        $mealPlan->menus()->sync($MenuSyncData);
-
-        $ItemSyncData = $request->getItemSyncData();
-        $mealPlan->menu.items()->sync($ItemSyncData); //リレーション未設定
-
+            $syncData = $request->getFormattedMenuData(); // リクエストでデータを成型
+            $mealPlan->syncMenusAndIngredients($syncData); // モデルに中間テーブルへの保存ロジックあり
+        });
 
         return redirect()->route('meal_plans.index')->with('success', '献立を更新しました！');
     }
@@ -166,8 +139,10 @@ class MealPlanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(MealPlan $mealPlan)
     {
-        //
+        $mealPlan->delete();
+
+        return redirect()->route('meal_plans.index')->with('success', '献立を削除しました！');
     }
 }

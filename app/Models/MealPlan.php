@@ -69,4 +69,42 @@ class MealPlan extends Model
             'endOfCalendar' => $endOfCalendar,
         ];
     }
+
+    // 中間テーブルのデータを一括同期するためのファンクション(@storeと@updateで使用)
+    // MealPlanRequestでデータ型を成型している（menuData）
+    public function syncMenusAndIngredients(array $menuDataList): void
+    {
+        // update時は古い紐づきを一旦すべて削除する(storeと共通ロジックにするため)
+        if ($this->menus()->exists()) {
+            // 中間テーブルのIDを引っ張ってきて、紐づく食材（3階層目）を削除
+            $mealPlanMenuIds = \DB::table('meal_plan_menu')->where('meal_plan_id', $this->id)->pluck('id');
+            \DB::table('meal_plan_menu_item')->whereIn('meal_plan_menu_id', $mealPlanMenuIds)->delete();
+
+            // 紐づくメニュー（2階層目）を削除
+            $this->menus()->detach();
+        }
+
+        // 新たに保存しなおす
+        foreach ($menuDataList as $menuData) {
+            // 中間テーブル（meal_plan_menu）にメニューを保存
+            $this->menus()->attach($menuData['menu_id']);
+
+            // 今保存した meal_plan_menu の ID を取得
+            $mealPlanMenuId = \DB::table('meal_plan_menu')
+                ->where('meal_plan_id', $this->id)
+                ->where('menu_id', $menuData['menu_id'])
+                ->value('id');
+
+            // 中間テーブル（meal_plan_menu_item）に調整後の食材を保存（3階層目）
+            foreach ($menuData['ingredients'] as $ingredient) {
+                \DB::table('meal_plan_menu_item')->insert([
+                    'meal_plan_menu_id' => $mealPlanMenuId,
+                    'item_id' => $ingredient['item_id'],
+                    'adjust_amount' => $ingredient['required_amount'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+    }
 }

@@ -44,7 +44,7 @@ class MenuRequest extends FormRequest
     }
 
     /**
-     * 中間テーブルにデータをsyncするためのロジック
+     * 中間テーブルに保存するためのデータを成型
      */
     public function getSyncData(): array
     {
