@@ -6,28 +6,34 @@ use App\Models\Order;
 use App\Models\Item;
 use App\Models\Vendor;
 use App\Http\Requests\OrderRequest;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     /**
-     * 発注・納品記録一覧を表示
+     * 発注履歴一覧を表示
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::all();
+        $orders = Order::with('item','vendor')
+            ->statusSearch($request->status)
+            ->vendorSearch($request->vendor_id)
+            ->latest('ordered_date',)
+            ->paginate(10);
 
-        return view('orders.index', compact('orders'));
+        $vendors = Vendor::all();
+
+        return view('orders.index', compact('orders','vendors'));
     }
 
     /**
      * 発注・納品記録作成フォームを表示
      */
-    public function create()
+    public function create(Item $item)
     {
-        $items = Item::orderBy('name')->get();
-        $vendor = Vendor::orderBy('name')->get();
+        $vendors = Vendor::all();
 
-        return view('orders.create', compact('items', 'vendor'));
+        return view('orders.create', compact('item', 'vendors'));
     }
 
     /**

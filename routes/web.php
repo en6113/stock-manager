@@ -15,8 +15,10 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('stocks', StockController::class)->only('index','store','edit','update');
 
+    Route::get('/orders/create/{item}', [OrderController::class, 'create'])->name('orders.create');
+    Route::resource('orders', OrderController::class)->except('create', 'show');
+
     Route::resource('items', ItemController::class);
     Route::resource('menus', MenuController::class);
     Route::resource('meal_plans', MealPlanController::class);
-    Route::resource('orders', OrderController::class);
 });
