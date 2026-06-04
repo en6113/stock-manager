@@ -2,7 +2,7 @@
 
 <div class="container mx-auto p-6 max-w-4xl">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-8xl">献立の編集</h1>
+        <h1 class="text-2xl font-bold text-gray-800">献立の編集</h1>
         <form action="{{ route('meal_plans.destroy', $mealPlan->id) }}" method="POST" onsubmit="return confirm('本当にこの日の献立を削除しますか？在庫計算に影響が出る場合があります。')">
             @csrf
             @method('DELETE')
@@ -20,71 +20,89 @@
             <input type="hidden" name="date" value="{{ $mealPlan->date }}">
         </div>
 
-        @php
-            $categories = [
-                1 => ['label' => '主菜 (Main)', 'key' => 'main'],
-                2 => ['label' => '副菜 (Side)', 'key' => 'side'],
-                3 => ['label' => '汁物 (Soup)', 'key' => 'soup'],
-                4 => ['label' => 'おやつ (Snack)', 'key' => 'snack']
-            ];
-        @endphp
+        @foreach($categories as $category)
+                    @php
+            $currentMenu = $mealPlan->menus->where('category_id', $category->id)->first();
+            $currentAdjustedItems = [];
+            if ($currentMenu) {
+                $currentMealPlanMenu = \DB::table('meal_plan_menu')
+                    ->where('meal_plan_id', $mealPlan->id)
+                    ->where('menu_id', $currentMenu->id)
+                    ->first();
 
-        @foreach($categories as $catId => $catInfo)
-            @php
-                // 現在の献立に登録されている、このカテゴリのメニューを取得
-                $currentMenu = $mealPlan->menus->where('dish_category', $catId)->first();
-            @endphp
+                if ($currentMealPlanMenu) {
+                    $currentAdjustedItems = $adjustedItems->where('meal_plan_menu_id', $currentMealPlanMenu->id);
+                }
+            }
+                    @endphp
 
-            <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $catId }}">
-                <h2 class="text-lg font-semibold text-gray-8xl mb-4 border-b pb-2">{{ $catInfo['label'] }}</h2>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-                    <select name="menus[{{ $catId }}][menu_id]" class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500" onchange="loadMenuIngredients(this, {{ $catId }})">
-                        <option value="">-- なし --</option>
-                        @foreach($menus->where('dish_category', $catId) as $menu)
-                            <option value="{{ $menu->id }}" {{ (old("menus.$catId.menu_id", $currentMenu->id ?? null) == $menu->id) ? 'selected' : '' }}>
-                                {{ $menu->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $category->id }}">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
 
-                <div class="ingredient-adjustment-area {{ $currentMenu ? '' : 'hidden' }}">
-                    <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整 (1人あたり)</h3>
-                    <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
-                        
-                        {{-- すでにメニューが紐づいている場合は、Blade側で最初から食材ループを展開しておく --}}
-                        @if($currentMenu)
-                            {{-- 練習用に、meal_plan_menu_item または menu->items (中間テーブル経由) から必要量を取得 --}}
-                            @foreach($currentMenu->items as $index => $item)
-                                @php
-                                    // 実際の実装では、修正済みテーブル(meal_plan_menu_item)があればそちらの数量、なければデフォルトの必要量(item_menu)を出すロジックにします
-                                    $amount = $item->pivot->adjusted_amount ?? $item->pivot->required_amount;
-                                @endphp
-                                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
-                                    <div class="flex-1">
-                                        <span class="font-medium text-gray-8xl">{{ $item->name }}</span>
-                                        <span class="text-xs text-gray-500 ml-2">({{ $item->item_category }})</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <input type="hidden" name="menus[{{ $catId }}][ingredients][{{ $index }}][item_id]" value="{{ $item->id }}">
-                                        
-                                        <label class="text-xs text-gray-500">必要量:</label>
-                                        <input type="number" 
-                                               name="menus[{{ $catId }}][ingredients][{{ $index }}][required_amount]" 
-                                               value="{{ old("menus.$catId.ingredients.$index.required_amount", $amount) }}" 
-                                               class="w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
-                                               min="1">
-                                        <span class="text-gray-600 text-xs w-8">{{ $item->unit }}</span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                            <select name="menus[{{ $category->id }}][menu_id]"
+                                class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500"
+                                onchange="loadMenuIngredients(this, {{ $category->id }})">
+                                <option value="">-- なし --</option>
+                                @foreach($menus->where('category_id', $category->id) as $menu)
+                                    <option value="{{ $menu->id }}" {{ ($currentMenu && $currentMenu->id == $menu->id) ? 'selected' : '' }}>
+                                        {{ $menu->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        {{-- 食材・分量の微調整エリア --}}
+                        <div class="ingredient-adjustment-area {{ $currentMenu ? '' : 'hidden' }}">
+                            <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                            <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+
+                                @if($currentMenu)
+                                    {{-- パターンA: 微調整データ（MealPlanMenuItem）が存在する場合 --}}
+                                    @if(count($currentAdjustedItems) > 0)
+                                        @foreach($currentAdjustedItems as $index => $adjustedItem)
+                                            <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                                                <div class="flex-1">
+                                                    <span class="font-medium text-gray-800">{{ $adjustedItem->item->name }}</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <input type="hidden" name="menus[{{ $category->id }}][ingredients][{{ $index }}][item_id]"
+                                                        value="{{ $adjustedItem->item_id }}">
+
+                                                    <label class="text-xs text-gray-500">必要量:</label>
+                                                    <input type="number" name="menus[{{ $category->id }}][ingredients][{{ $index }}][required_amount]"
+                                                        value="{{ old("menus.{$category->id}.ingredients.{$index}.required_amount", $adjustedItem->adjust_amount) }}"
+                                                        class="w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500" min="1">
+                                                    <span class="text-gray-600 text-xs w-8">{{ $adjustedItem->item->unit }}</span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+
+                                        {{-- パターンB: 微調整データがない場合 ➔ メニュー本来の食材（Menu->items）を表示する --}}
+                                    @else
+                                        @foreach($currentMenu->items as $index => $item)
+                                            <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                                                <div class="flex-1">
+                                                    <span class="font-medium text-gray-800">{{ $item->name }}</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <input type="hidden" name="menus[{{ $category->id }}][ingredients][{{ $index }}][item_id]"
+                                                        value="{{ $item->id }}">
+
+                                                    <label class="text-xs text-gray-500">必要量:</label>
+                                                    <input type="number" name="menus[{{ $category->id }}][ingredients][{{ $index }}][required_amount]" 
+                                                        value="{{ old("menus.{$category->id}.ingredients.{$index}.required_amount", $item->pivot->required_amount) }}"
+                                                        class="w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500" min="1">
+                                                    <span class="text-gray-600 text-xs w-8">{{ $item->unit }}</span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
         @endforeach
 
         <div class="flex justify-end space-x-4">

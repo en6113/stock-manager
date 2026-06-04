@@ -22,12 +22,6 @@ class MealPlan extends Model
         return $this->belongsToMany(Menu::class, 'meal_plan_menu');
     }
 
-    // この献立に属するメニューの食材を取得
-    public function mealPlanMenuItems(): BelongsToMany
-    {
-        return $this->belongsToMany(MenuItem::class, 'meal_plan_menu_item');
-    }
-
     /**
      * カレンダー表示に必要な日付データを一斉に計算する
      * * @param string|null $monthParam (例: "2026-06")
