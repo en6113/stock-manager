@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Item;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class MealPlanMenuItem extends Model
@@ -13,4 +15,10 @@ class MealPlanMenuItem extends Model
         'item_id',
         'adjust_amount',
     ];
+
+    // この献立に紐づく食材を取得する
+    public function item() : belongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

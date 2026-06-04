@@ -13,27 +13,20 @@
                 required>
         </div>
 
-        {{-- 4つのカテゴリをループで回して同じ構造の入力欄を作る（ロジックの共通化） --}}
-        @php
-$categories = [
-    1 => ['label' => '主菜 (Main)', 'key' => 'main'],
-    2 => ['label' => '副菜 (Side)', 'key' => 'side'],
-    3 => ['label' => '汁物 (Soup)', 'key' => 'soup'],
-    4 => ['label' => 'おやつ (Snack)', 'key' => 'snack']
-];
-        @endphp
+        @foreach($categories as $category)
+            <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $category->id }}">
 
-        @foreach($categories as $catId => $catInfo)
-            <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $catId }}">
-                <h2 class="text-lg font-semibold text-gray-8xl mb-4 border-b pb-2">{{ $catInfo['label'] }}</h2>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-                    <select name="menus[{{ $catId }}][menu_id]"
+
+                    <select name="menus[{{ $category->id }}][menu_id]"
                         class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        onchange="loadMenuIngredients(this, {{ $catId }})">
+                        onchange="loadMenuIngredients(this, {{ $category->id }})">
                         <option value="">-- メニューを選択してください --</option>
-                        @foreach($menus->where('dish_category', $catId) as $menu)
+
+                        @foreach($menus->where('category_id', $category->id) as $menu)
                             <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
                         @endforeach
                     </select>

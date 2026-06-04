@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Category;
 use App\Models\Item;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Menu extends Model
@@ -15,10 +17,16 @@ class Menu extends Model
 
     protected $fillable = [
         'id',
+        'category_id',
         'name',
-        'dish_category',
         'calorie',
     ];
+
+    // メニューは特定のカテゴリに属する
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     // このメニューに属する食材を取得
     public function items() : BelongsToMany
@@ -44,13 +52,13 @@ class Menu extends Model
     /**
      * カテゴリー検索スコープ
      */
-    public function scopeCategorySearch(Builder $query, ?int $dishCategory): Builder
+    public function scopeCategorySearch(Builder $query, ?int $category): Builder
     {
-        if (blank($dishCategory)) {
+        if (blank($category)) {
             return $query;
         }
 
-        return $query->where('dish_category', $dishCategory);
+        return $query->where('category_id', $category);
     }
 
     // カテゴリを数値から文字列に変換するアクセサ
@@ -58,13 +66,13 @@ class Menu extends Model
     {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
-                $code = (int)$attributes['dish_category'];
+                $code = (int)$attributes['category_id'];
 
                 $categories = [
                     1 => '主菜',
                     2 => '副菜',
                     3 => '汁物',
-                    4 => 'おやつ',
+                    4 => 'その他',
                 ];
                 return $categories[$code] ?? '不明';
             }
