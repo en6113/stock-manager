@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Models\Item;
 use App\Models\Vendor;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\belongsTo;
 
 class Order extends Model
 {
@@ -44,5 +44,29 @@ class Order extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    /**
+     * ステータス検索スコープ
+     */
+    public function scopeStatusSearch(Builder $query, ?int $status): Builder
+    {
+        if (blank($status)) { // blank():値が空文字やnullの場合にクエリをそのまま返す
+            return $query;
+        }
+
+        return $query->where('status', $status);
+    }
+
+    /**
+     * 業者検索スコープ
+     */
+    public function scopeVendorSearch(Builder $query, ?int $vendor): Builder
+    {
+        if (blank($vendor)) {
+            return $query;
+        }
+
+        return $query->where('vendor_id', $vendor);
     }
 }

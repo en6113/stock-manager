@@ -22,7 +22,9 @@ class OrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ordered_qty' => 'nullable|integer',
+            'item_id' => 'required|integer|exists:items,id',
+            'status' => 'nullable|string|between:0,3',
+            'ordered_qty' => 'nullable|numeric|min:0.1',
             'ordered_date' => 'nullable|date',
             'vendor_id' => 'integer|exists:vendors,id',
             'received_date' => 'nullable|date',

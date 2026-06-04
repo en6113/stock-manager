@@ -97,8 +97,8 @@
                                                 更新
                                             </button>
                                             
-                                            <a href="{{ route('orders.edit', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[64px] inline-block text-center leading-tight">
-                                                発注記録
+                                            <a href="{{ route('orders.edit', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[70px] inline-block text-center leading-tight">
+                                                発注・管理
                                             </a>
                                         </div>
                                     </td>
