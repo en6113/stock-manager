@@ -99,9 +99,7 @@
                                 </td>
                                 {{-- 発注業者 --}}
                                 <td class="py-3 px-4 text-gray-600 whitespace-nowrap">
-                                    <td class="py-3 px-4 text-gray-600 whitespace-nowrap">
-                                        {{ $order->vendor->name ?? '未設定' }}
-                                    </td>
+                                    {{ $order->vendor->name ?? '未設定' }}
                                 </td>
                                 {{-- 操作ボタン --}}
                                 <td class="py-3 px-4 text-center whitespace-nowrap">
