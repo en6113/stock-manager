@@ -21,7 +21,8 @@ class StockController extends Controller
                     $query->join('meal_plan_menu', 'menus.id', '=', 'meal_plan_menu.menu_id')
                         ->join('meal_plans', 'meal_plan_menu.meal_plan_id', '=', 'meal_plans.id')
                         ->join('meal_plan_menu_item', 'meal_plan_menu.id', '=', 'meal_plan_menu_item.meal_plan_menu_id')
-                        ->where('meal_plans.date', '>=', now()->toDateString());
+                        ->where('meal_plans.date', '>=', now()->toDateString())
+                        ->whereColumn('meal_plan_menu_item.item_id', 'items.id');
             }], 'meal_plan_menu_item.adjust_amount')
 
             // 納品済の数量（status = 2 の合計）
