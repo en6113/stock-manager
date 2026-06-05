@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Item;
 use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
@@ -68,5 +69,23 @@ class Order extends Model
         }
 
         return $query->where('vendor_id', $vendor);
+    }
+
+    /**
+     * ステータスを自動変更するロジック
+     */
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            set: function ($value, $attributes) {
+                // 日付の入力状況から自動判定して上書き
+                if (!empty($attributes['received_date'])) {
+                    return '2';
+                } elseif (!empty($attributes['ordered_date'])) {
+                    return '1';
+                }
+                return '0';
+            }
+        );
     }
 }

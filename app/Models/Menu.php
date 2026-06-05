@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Category;
+use App\Models\DishCategory;
 use App\Models\Item;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,15 +17,15 @@ class Menu extends Model
 
     protected $fillable = [
         'id',
-        'category_id',
+        'dish_category_id',
         'name',
         'calorie',
     ];
 
     // メニューは特定のカテゴリに属する
-    public function category(): BelongsTo
+    public function dishCategory(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(DishCategory::class);
     }
 
     // このメニューに属する食材を取得
@@ -58,25 +58,6 @@ class Menu extends Model
             return $query;
         }
 
-        return $query->where('category_id', $category);
+        return $query->where('dish_category_id', $category);
     }
-
-    // カテゴリを数値から文字列に変換するアクセサ
-    protected function dishCategoryLabel(): Attribute
-    {
-        return Attribute::make(
-            get: function (mixed $value, array $attributes) {
-                $code = (int)$attributes['category_id'];
-
-                $categories = [
-                    1 => '主菜',
-                    2 => '副菜',
-                    3 => '汁物',
-                    4 => 'その他',
-                ];
-                return $categories[$code] ?? '不明';
-            }
-        );
-    }
-
 }

@@ -41,9 +41,18 @@ class OrderController extends Controller
      */
     public function store(OrderRequest $request)
     {
-        $validated = $request->validated();
+        $order = new Order();
+        $order->fill($request->validated());
 
-        $order = Order::create($validated);
+        if (!empty($order->received_date)) {
+            $order->status = '2'; // 納品済
+        } elseif (!empty($order->ordered_date)) {
+            $order->status = '1'; // 発注済
+        } else {
+            $order->status = '0'; // 未発注
+        }
+
+        $order->save();
 
         return redirect()->route('orders.index')->with('success', '発注・納品記録を登録しました。');
     }
@@ -53,6 +62,8 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
+        $vendors = Vendor::all();
+
         // item_id に紐づく全てのstockデータを取得し、発注順で並べる
         $orders = Order::with('item')
             ->where('item_id', $order->item_id)
@@ -61,7 +72,7 @@ class OrderController extends Controller
 
         $item = $order->item;
 
-        return view('orders.edit', compact('orders', 'item'));
+        return view('orders.edit', compact('vendors','orders', 'item'));
     }
 
     /**

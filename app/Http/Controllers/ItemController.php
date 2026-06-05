@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ItemRequest;
 use App\Models\Allergen;
 use App\Models\Item;
+use App\Models\ItemCategory;
 use App\Models\Vendor;
 
 class ItemController extends Controller
@@ -24,10 +25,11 @@ class ItemController extends Controller
      */
     public function create()
     {
+        $categories = ItemCategory::all();
         $vendors = Vendor::orderBy('name')->get();
         $allergens = Allergen::orderBy('name')->get();
 
-        return view('items.create', compact('vendors', 'allergens'));
+        return view('items.create', compact('categories','vendors', 'allergens'));
     }
 
     /**

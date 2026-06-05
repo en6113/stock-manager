@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Category;
+use App\Models\DishCategory;
 use App\Models\MealPlan;
 use App\Models\MealPlanMenuItem;
 use App\Models\Menu;
@@ -50,7 +50,7 @@ class MealPlanController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
+        $categories = DishCategory::all();
 
         $menusWithItems = Menu::with('items')->get();
 
@@ -67,7 +67,7 @@ class MealPlanController extends Controller
             return [$menu->id => $ingredients];
         });
 
-        $menus = Menu::with('category')->get();
+        $menus = Menu::with('dishCategory')->get();
 
         return view('meal_plans.create', compact('categories','menus', 'menuIngredientsData'));
     }
@@ -94,7 +94,7 @@ class MealPlanController extends Controller
      */
     public function edit(MealPlan $mealPlan)
     {
-        $categories = Category::all();
+        $categories = DishCategory::all();
         $menus = Menu::all();
 
 

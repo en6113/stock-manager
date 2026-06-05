@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone_number', 11);
             $table->string('contact_person');
-            $table->string('product_category');
             $table->timestamps();
         });
     }

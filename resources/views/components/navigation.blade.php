@@ -16,10 +16,10 @@
                         メニュー一覧
                     </a>
                     <a href="{{ route('items.index') }}" class="text-gray-300 hover:text-white">
-                        食材詳細
+                        食材一覧
                     </a>
                     <a href="{{ route('orders.index') }}" class="text-gray-300 hover:text-white">
-                        発注履歴
+                        発注履歴一覧
                     </a>
                     <span class="text-gray-300">
                         {{ auth()->user()->name }}さん

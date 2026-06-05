@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             VendorSeeder::class,
             AllergenSeeder::class,
-            CategorySeeder::class,
+            ItemCategorySeeder::class,
+            DishCategorySeeder::class,
             MenuSeeder::class,
             MealPlanSeeder::class,
             ItemSeeder::class,
-            OrderSeeder::class,
             StockSeeder::class,
         ]);
     }

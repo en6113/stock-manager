@@ -9,17 +9,13 @@
         </div>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-4">
             <h1 class="text-2xl font-semibold text-gray-800 leading-tight">発注・納品の記録</h1>
-            <a href="{{ route('orders.create', ['item' => $item->id]) }}"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-150 text-sm inline-block">
-                ＋ 発注する
-            </a>
         </div>
         <div class = "mb-4">
             <p class="text-sm text-gray-600 mt-1">
                 食材: <span class="font-bold text-gray-900">{{ $item->name }}</span> のステータスおよび詳細情報を編集します。
             </p>
             <p class="text-sm text-gray-600 mt-1">
-                現時点における使用予定量: <span class="font-bold text-gray-900">{{ $item->getReservedQty() }}{{ $item->unit }}</span>
+                現時点における使用予定量: <span class="font-bold text-gray-900">調整中{{ $item->unit }}</span>
             </p>        
         </div>
 
@@ -56,6 +52,15 @@
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">1. 発注記録</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 <div>
+                                    <label for="ordered_date_{{ $order->id }}" class="block text-xs font-medium text-gray-600 mb-1">
+                                        発注日
+                                    </label>
+                                    <input type="date" name="ordered_date" id="ordered_date_{{ $order->id }}"
+                                        class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                                        value="{{ old('ordered_date', $order->ordered_date ? \Carbon\Carbon::parse($order->ordered_date)->format('Y-m-d') : '') }}">
+                                </div>
+
+                                <div>
                                     <label for="ordered_qty_{{ $order->id }}" class="block text-xs font-medium text-gray-600 mb-1">
                                         発注数
                                     </label>
@@ -67,25 +72,15 @@
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label for="ordered_date_{{ $order->id }}" class="block text-xs font-medium text-gray-600 mb-1">
-                                        発注日
-                                    </label>
-                                    <input type="date" name="ordered_date" id="ordered_date_{{ $order->id }}"
-                                        class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
-                                        value="{{ old('ordered_date', $order->ordered_date ? \Carbon\Carbon::parse($order->ordered_date)->format('Y-m-d') : '') }}">
-                                </div>
-
                                 <div class="sm:col-span-2 md:col-span-1">
                                     <label for="vendor_{{ $order->id }}" class="block text-xs font-medium text-gray-600 mb-1">
                                         発注業者
                                     </label>
                                     <select name="vendor_id" id="vendor_{{ $order->id }}" required
                                         class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm font-medium">
-                                        <option value="1" {{ old('vendor_id', $order->item->vendor_id) == 1 ? 'selected' : '' }}>1: 総合卸業者</option>
-                                        <option value="2" {{ old('vendor_id', $order->item->vendor_id) == 2 ? 'selected' : '' }}>2: 八百屋</option>
-                                        <option value="3" {{ old('vendor_id', $order->item->vendor_id) == 3 ? 'selected' : '' }}>3: 精肉屋</option>
-                                        <option value="4" {{ old('vendor_id', $order->item->vendor_id) == 4 ? 'selected' : '' }}>4: 精魚屋</option>
+                                        @foreach($vendors as $vendor)
+                                            <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

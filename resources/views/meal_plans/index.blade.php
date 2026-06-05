@@ -15,8 +15,8 @@
             </div>
 
             <a href="{{ route('meal_plans.create') }}"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                新規献立登録
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow">
+                ＋ 新規献立登録
             </a>
         </div>
 
