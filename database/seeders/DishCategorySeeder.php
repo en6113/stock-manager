@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
+use App\Models\DishCategory;
 use Illuminate\Database\Seeder;
 
-class CategorySeeder extends Seeder
+class DishCategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,7 +20,7 @@ class CategorySeeder extends Seeder
         ];
     
         foreach($names as $name) {
-            Category::create(['name' => $name]);
+            DishCategory::create(['name' => $name]);
         }
     }
 }

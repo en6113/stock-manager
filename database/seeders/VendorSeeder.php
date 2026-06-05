@@ -19,7 +19,6 @@ class VendorSeeder extends Seeder
                 'email' => 'vendor@example.com',
                 'phone_number' => '09012345678',
                 'contact_person' => '担当者名',
-                'product_category' => '調味料・牛乳・その他',
             ],
             [
                 'name' => '八百屋',
@@ -27,7 +26,6 @@ class VendorSeeder extends Seeder
                 'email' => 'yaoya@example.com',
                 'phone_number' => '09012345678',
                 'contact_person' => '担当者名',
-                'product_category' => '野菜・果物',
             ],
             [
                 'name' => '精肉店',
@@ -35,7 +33,6 @@ class VendorSeeder extends Seeder
                 'email' => 'nikuya@example.com',
                 'phone_number' => '09012345678',
                 'contact_person' => '担当者名',
-                'product_category' => '肉',
             ],
             [
                 'name' => '精魚店',
@@ -43,7 +40,6 @@ class VendorSeeder extends Seeder
                 'email' => 'sakanaya@example.com',
                 'phone_number' => '09012345678',
                 'contact_person' => '担当者名',
-                'product_category' => '魚',
             ],
         ];
 

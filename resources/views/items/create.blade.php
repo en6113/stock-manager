@@ -26,17 +26,11 @@
 
                             <div class="flex flex-col">
                                 <label class="leading-loose text-sm font-medium">種類</label>
-                                <select name="item_category" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
-                                        <option value="">選択してください</option>
-                                        <option value="野菜類">野菜類（いも類含む）</option>
-                                        <option value="肉類">肉類</option>
-                                        <option value="魚介類">魚介類</option>
-                                        <option value="卵類">卵類</option>
-                                        <option value="きのこ・海藻類">きのこ・海藻類</option>
-                                        <option value="加工食品">加工食品（調味料含む）</option>
-                                        <option value="果実類">果実類</option>
-                                        <option value="その他">その他</option>
-                                    </select>
+                                <select name="item_category_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="flex flex-col md:flex-row gap-4">

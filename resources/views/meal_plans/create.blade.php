@@ -26,7 +26,7 @@
                         onchange="loadMenuIngredients(this, {{ $category->id }})">
                         <option value="">-- メニューを選択してください --</option>
 
-                        @foreach($menus->where('category_id', $category->id) as $menu)
+                        @foreach($menus->where('dish_category_id', $category->id) as $menu)
                             <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
                         @endforeach
                     </select>

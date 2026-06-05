@@ -22,7 +22,7 @@
 
         @foreach($categories as $category)
                     @php
-            $currentMenu = $mealPlan->menus->where('category_id', $category->id)->first();
+            $currentMenu = $mealPlan->menus->where('dish_category_id', $category->id)->first();
             $currentAdjustedItems = [];
             if ($currentMenu) {
                 $currentMealPlanMenu = \DB::table('meal_plan_menu')
@@ -45,7 +45,7 @@
                                 class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500"
                                 onchange="loadMenuIngredients(this, {{ $category->id }})">
                                 <option value="">-- なし --</option>
-                                @foreach($menus->where('category_id', $category->id) as $menu)
+                                @foreach($menus->where('dish_category_id', $category->id) as $menu)
                                     <option value="{{ $menu->id }}" {{ ($currentMenu && $currentMenu->id == $menu->id) ? 'selected' : '' }}>
                                         {{ $menu->name }}
                                     </option>

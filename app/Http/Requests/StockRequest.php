@@ -23,6 +23,7 @@ class StockRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'vendor_id' => 'required|integer|exists:vendors.id',
             'stock' => 'required|integer|min:0',
         ];
     }

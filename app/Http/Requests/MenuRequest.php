@@ -24,10 +24,10 @@ class MenuRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'dish_category' => 'required|integer',
+            'dish_category_id' => 'required|integer',
+            'servings' => 'required|integer',
             'calories' => 'nullable|integer',
             'item_name.*' => 'required|string',
-            'servings' => 'required|integer',
             'required_amounts.*' => 'required_with:item_name.*|nullable|numeric|min:0.1',
         ];
     }
@@ -36,7 +36,7 @@ class MenuRequest extends FormRequest
     {
         return [
             'name.required' => 'メニュー名を入力してください。',
-            'dish_category.required' => 'カテゴリーを選択してください。',
+            'dish_category_id.required' => 'カテゴリーを選択してください。',
             'item_id.required' => '食材名を入力してください。',
             'servings.required' => '何人分を想定しているかを入力してください。',
             'required_amount.required' => '必要量を入力してください',

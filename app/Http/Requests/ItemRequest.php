@@ -30,6 +30,7 @@ class ItemRequest extends FormRequest
                 'max:255',
                 Rule::unique('items', 'name')->ignore($this->item),
             ],
+            'item_category_id' => 'required|integer',
             'target_stock_qty' => 'required|integer|min:1',
             'unit' => 'required|string|max:30',
             'capacity' => 'nullable|string|max:30',

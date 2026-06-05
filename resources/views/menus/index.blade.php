@@ -17,11 +17,9 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
                         <select name="dish_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
-                            <option value="">すべて</option>
-                            <option value="1" {{ request('category_id') == '1' ? 'selected' : '' }}>主菜</option>
-                            <option value="2" {{ request('category_id') == '2' ? 'selected' : '' }}>副菜</option>
-                            <option value="3" {{ request('category_id') == '3' ? 'selected' : '' }}>汁物</option>
-                            <option value="4" {{ request('category_id') == '4' ? 'selected' : '' }}>おやつ</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">検索</button>
@@ -46,26 +44,37 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($menus as $menu)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $menu->id }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ $menu->name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $menu->dish_category_label }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $menu->calories ? $menu->calories . ' kcal' : '未設定' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="font-semibold text-blue-600">{{ $menu->items_count ?? $menu->items->count() }}</span> 品目
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-3">
-                                    <a href="{{ route('menus.edit', $menu->id) }}" class="text-indigo-600 hover:text-indigo-900">編集</a>
-                                    
-                                    <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">削除</button>
-                                    </form>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $menu->id }}
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                        {{ $menu->name }}
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $menu->dishCategory->name }}
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $menu->calories ? $menu->calories . ' kcal' : '未設定' }}
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="font-semibold text-blue-600">{{ $menu->items_count ?? $menu->items->count() }}</span> 品目
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-3">
+                                        <a href="{{ route('menus.edit', $menu->id) }}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-medium shadow-sm transition-colors">編集</a>
+
+                                        <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded font-medium shadow-sm transition-colors">削除</button>
+                                        </form>
+                                    </td>
+                                </tr>
                             @empty
                             <tr>
                                 <td colspan="6" class="px-6 py-4 text-center text-gray-500 text-sm">メニューが登録されていません。</td>

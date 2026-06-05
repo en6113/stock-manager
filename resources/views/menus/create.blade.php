@@ -22,26 +22,25 @@
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" required
                             placeholder="例：ハンバーグ">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">総カロリー (kcal)</label>
-                        <input type="number" name="calories"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" placeholder="任意">
-                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
-                        <select name="dish_category"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
-                            <option value="1">主菜 (main)</option>
-                            <option value="2">副菜 (side)</option>
-                            <option value="3">汁物 (soup)</option>
-                            <option value="4">おやつ (snack)</option>
+                        <select name="dish_category_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700">何人前</label>
-                        <input type="number" name="servings"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" value="1" min="1"
-                            required>
+                        <input type="number" name="servings" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" value="1" min="1" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">総カロリー (kcal/人)</label>
+                        <input type="number" name="calories"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" placeholder="任意">
                     </div>
                 </div>
 

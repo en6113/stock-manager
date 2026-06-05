@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DishCategory;
 use App\Models\Item;
 use App\Models\Menu;
 use App\Http\Requests\IndexMenuRequest;
@@ -14,12 +15,14 @@ class MenuController extends Controller
      */
     public function index(IndexMenuRequest $request)
     {
+        $categories = DishCategory::all();
+
         $menus = Menu::withCount('items')
             ->keywordSearch($request->keyword)
             ->categorySearch($request->dish_category)
             ->paginate(10);
 
-        return view('menus.index', compact('menus'));
+        return view('menus.index', compact('categories','menus'));
     }
 
     /**
@@ -27,9 +30,10 @@ class MenuController extends Controller
      */
     public function create()
     {
+        $categories = DishCategory::all();
         $registered_items = Item::all();
 
-        return view('menus.create', compact('registered_items'));
+        return view('menus.create', compact('categories','registered_items'));
     }
 
     /**

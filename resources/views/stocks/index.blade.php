@@ -4,7 +4,6 @@
             <div>
                 <h1 class="text-2xl font-semibold text-gray-800 leading-tight">給食食材・在庫管理</h1>
             </div>
-            {{-- 別途食材を作成する画面へのリンク --}}
             <a href="{{ route('items.create') }}"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-150 text-sm">
                 ＋ マスタに新しい食材を追加
@@ -87,7 +86,7 @@
                                                 更新
                                             </button>
 
-                                            <a href="{{ route('orders.edit', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[70px] inline-block text-center leading-tight">
+                                            <a href="{{ route('orders.create', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[70px] inline-block text-center leading-tight">
                                                 発注・管理
                                             </a>
                                         </div>

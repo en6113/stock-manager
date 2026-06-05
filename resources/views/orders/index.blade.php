@@ -7,10 +7,9 @@
                 <p class="text-sm text-gray-600 mt-1">過去および現在のすべての発注・納品状態を管理します。</p>
             </div>
             <div>
-                {{-- 本来は食材選択などから遷移することを想定 --}}
                 <a href="{{ route('stocks.index') }}" 
-                   class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-150 text-sm inline-block">
-                    + 新しく発注する(在庫一覧へ)
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow">
+                    + 新しく発注情報を登録する(在庫一覧へ)
                 </a>
             </div>
         </div>
@@ -102,11 +101,17 @@
                                     {{ $order->vendor->name ?? '未設定' }}
                                 </td>
                                 {{-- 操作ボタン --}}
-                                <td class="py-3 px-4 text-center whitespace-nowrap">
-                                    {{-- 既存の編集画面(edit)へ遷移 --}}
-                                    <a href="{{ route('orders.edit', $order->item_id) }}" class="text-indigo-600 hover:text-indigo-900 font-medium text-xs bg-indigo-50 hover:bg-indigo-100 py-1 px-2.5 rounded transition">
-                                        詳細・編集
-                                    </a>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                        <a href="{{ route('orders.edit', $order->id) }}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-medium shadow-sm transition-colors">
+                                            編集
+                                        </a>
+                                        <form action="{{ route('orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('本当に発注履歴を削除しますか？')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded font-medium shadow-sm transition-colors">削除</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

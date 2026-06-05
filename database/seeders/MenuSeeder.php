@@ -15,11 +15,11 @@ class MenuSeeder extends Seeder
         $menus = [
             [
                 'name' => 'カレー',
-                'category_id' => 1, //1:main
+                'dish_category_id' => 1, //1:主菜(main)
             ],
             [
                 'name' => 'ツナマヨコーンサラダ',
-                'category_id' => 2, //2:side
+                'dish_category_id' => 2, //2:副菜(side)
             ]
         ];
 
