@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('meal_plan_menu_id')->constrained('meal_plan_menu')->cascadeOnDelete();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
+            $table->integer('servings');
             $table->decimal('adjust_amount', 8, 1);
             $table->timestamps();
         });

@@ -29,12 +29,6 @@
                         <option value="4" {{ $menu->dish_category == 4 ? 'selected' : '' }}>おやつ (snack)</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">何人前</label>
-                    <input type="number" name="servings"
-                        value="{{ old('servings', $menu->items->first()?->pivot?->servings ?? 1) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" min="1" required>
-                </div>
             </div>
 
             <hr class="my-6 border-gray-200">

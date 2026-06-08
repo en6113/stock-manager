@@ -21,6 +21,9 @@
                     <a href="{{ route('orders.index') }}" class="text-gray-300 hover:text-white">
                         発注履歴一覧
                     </a>
+                    <a href="{{ route('reports.index') }}" class="text-gray-300 hover:text-white">
+                        CSV出力
+                    </a>
                     <span class="text-gray-300">
                         {{ auth()->user()->name }}さん
                     </span>

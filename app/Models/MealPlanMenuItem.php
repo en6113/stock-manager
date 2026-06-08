@@ -13,6 +13,7 @@ class MealPlanMenuItem extends Model
     protected $fillable = [
         'meal_plan_menu_id',
         'item_id',
+        'servings',
         'adjust_amount',
     ];
 
