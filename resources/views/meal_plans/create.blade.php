@@ -6,11 +6,18 @@
     <form action="{{ route('meal_plans.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <div class="bg-white p-6 rounded-lg shadow-sm border">
-            <label for="date" class="block text-sm font-medium text-gray-700 mb-2">提供日</label>
-            <input type="date" name="date" id="date" value="{{ request('date', old('date')) }}"
-                class="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                required>
+        <div class="bg-white p-6 rounded-lg shadow-sm border grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="date" class="block text-sm font-medium text-gray-700 mb-2">提供日</label>
+                <input type="date" name="date" id="date" value="{{ request('date', old('date')) }}"
+                    class="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">提供人数</label>
+                <input type="number" name="servings" class="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" value="50" min="1" required>
+            </div>
         </div>
 
         @foreach($categories as $category)
@@ -52,24 +59,22 @@
 <script>
     const menuIngredientsData = @json($menuIngredientsData ?? []);
 
+    // メニューが選択された時の処理
     function loadMenuIngredients(selectElement, categoryId) {
         const menuId = selectElement.value;
         const section = selectElement.closest('.category-section');
         const adjustmentArea = section.querySelector('.ingredient-adjustment-area');
         const ingredientList = section.querySelector('.ingredient-list');
 
-        // 未選択時は非表示
         if (!menuId) {
             adjustmentArea.classList.add('hidden');
             ingredientList.innerHTML = '';
             return;
         }
 
-        // 表示エリアをアクティブに
         adjustmentArea.classList.remove('hidden');
-        ingredientList.innerHTML = ''; // クリア
+        ingredientList.innerHTML = '';
 
-        // 対象メニューの食材データを取得 (練習用にモック、本来はリレーションから取得)
         const ingredients = menuIngredientsData[menuId] || [];
 
         if (ingredients.length === 0) {
@@ -77,8 +82,14 @@
             return;
         }
 
-        // 食材ごとに、微修正可能なinput群を生成(多次元配列のname属性にするのがポイント！)
+        // 現在入力されている提供人数を取得
+        const servingsInput = document.querySelector('input[name="servings"]');
+        const currentServings = servingsInput ? parseInt(servingsInput.value) || 50 : 50;
+
         ingredients.forEach((ing, index) => {
+            // ★ 計算：1人分の量(required_amount) × 提供人数
+            const totalAmount = ing.required_amount * currentServings;
+
             const html = `
                 <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
                     <div class="flex-1">
@@ -91,9 +102,10 @@
                         <label class="text-xs text-gray-500">必要量:</label>
                         <input type="number" 
                                 name="menus[${categoryId}][ingredients][${index}][required_amount]" 
-                                value="${ing.required_amount}" 
-                                class="w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
-                                min="1">
+                                data-per-person="${ing.required_amount}" 
+                                value="${totalAmount}" 
+                                class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
+                                min="0" step="0.1">
                         <span class="text-gray-600 text-xs w-8">${ing.unit}</span>
                     </div>
                 </div>
@@ -101,6 +113,24 @@
             ingredientList.insertAdjacentHTML('beforeend', html);
         });
     }
+
+    // ★ 新機能：提供人数（servings）が変更されたら、画面上の全食材の必要量を一斉に再計算する
+    document.addEventListener('DOMContentLoaded', function () {
+        const servingsInput = document.querySelector('input[name="servings"]');
+
+        if (servingsInput) {
+            servingsInput.addEventListener('input', function () {
+                const currentServings = parseInt(this.value) || 0;
+
+                // 画面上に生成されているすべての必要量inputをループ処理
+                document.querySelectorAll('.ingredient-amount-input').forEach(input => {
+                    const perPersonAmount = parseFloat(input.getAttribute('data-per-person')) || 0;
+                    // 新しい人数で掛け算して数値を更新
+                    input.value = (perPersonAmount * currentServings).toFixed(1);
+                });
+            });
+        }
+    });
 </script>
 
 </x-app-layout>

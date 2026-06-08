@@ -25,7 +25,6 @@ class MenuRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'dish_category_id' => 'required|integer',
-            'servings' => 'required|integer',
             'calories' => 'nullable|integer',
             'item_name.*' => 'required|string',
             'required_amounts.*' => 'required_with:item_name.*|nullable|numeric|min:0.1',
@@ -38,7 +37,6 @@ class MenuRequest extends FormRequest
             'name.required' => 'メニュー名を入力してください。',
             'dish_category_id.required' => 'カテゴリーを選択してください。',
             'item_id.required' => '食材名を入力してください。',
-            'servings.required' => '何人分を想定しているかを入力してください。',
             'required_amount.required' => '必要量を入力してください',
         ];
     }
@@ -59,7 +57,6 @@ class MenuRequest extends FormRequest
         $items = Item::whereIn('name', $itemNames)->get()->keyBy('name');
 
         $requiredAmounts = $this->input('required_amounts', []);
-        $servings = $this->input('servings');
 
         $syncData = [];
 
@@ -73,7 +70,6 @@ class MenuRequest extends FormRequest
             $amount = $requiredAmounts[$key] ?? 0;
 
             $syncData[$item->id] = [
-                'servings' => $servings,
                 'required_amount' => $amount,
             ];
         }

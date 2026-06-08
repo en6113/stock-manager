@@ -31,9 +31,19 @@ class MenuController extends Controller
     public function create()
     {
         $categories = DishCategory::all();
-        $registered_items = Item::all();
+        $allItems = Item::all();
 
-        return view('menus.create', compact('categories','registered_items'));
+        // 食材（カテゴリーが1〜14のもの）
+        $registered_items = $allItems->filter(function ($item) {
+            return $item->item_category_id >= 1 && $item->category_id <= 14;
+        });
+
+        // 調味料（カテゴリーが15〜19のもの）
+        $seasoning_items = $allItems->filter(function ($item) {
+            return $item->item_category_id >= 15 && $item->category_id <= 19;
+        });
+
+        return view('menus.create', compact('categories', 'registered_items', 'seasoning_items'));
     }
 
     /**

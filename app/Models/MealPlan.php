@@ -72,7 +72,7 @@ class MealPlan extends Model
 
     // 中間テーブルのデータを一括同期するためのファンクション(@storeと@updateで使用)
     // MealPlanRequestでデータ型を成型している（menuData）
-    public function syncMenusAndIngredients(array $menuDataList): void
+    public function syncMenusAndIngredients(array $menuDataList, int $globalServings): void
     {
         // update時は古い紐づきを一旦すべて削除する(storeと共通ロジックにするため)
         if ($this->menus()->exists()) {
@@ -95,11 +95,15 @@ class MealPlan extends Model
                 ->where('menu_id', $menuData['menu_id'])
                 ->value('id');
 
-            // 中間テーブル（meal_plan_menu_item）に調整後の食材を保存（3階層目）
+            // 中間テーブル（meal_plan_menu_item）に調整後の食材を保存
             foreach ($menuData['ingredients'] as $ingredient) {
+                // 必要量の合計を計算（1人分の必要量に提供人数を掛ける）
+                $totalAmount = $ingredient['required_amount'] * $globalServings;
+
                 \DB::table('meal_plan_menu_item')->insert([
                     'meal_plan_menu_id' => $mealPlanMenuId,
                     'item_id' => $ingredient['item_id'],
+                    'servings' => $globalServings,
                     'adjust_amount' => $ingredient['required_amount'],
                     'created_at' => now(),
                     'updated_at' => now(),
