@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Item;
+use App\Models\MealPlan;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,11 +14,10 @@ class MealPlanMenuItem extends Model
     protected $fillable = [
         'meal_plan_menu_id',
         'item_id',
-        'servings',
         'adjust_amount',
     ];
 
-    // この献立に紐づく食材を取得する
+    // この食材調整データが属する食材を取得する
     public function item() : belongsTo
     {
         return $this->belongsTo(Item::class);

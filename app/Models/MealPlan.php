@@ -87,7 +87,11 @@ class MealPlan extends Model
         // 新たに保存しなおす
         foreach ($menuDataList as $menuData) {
             // 中間テーブル（meal_plan_menu）にメニューを保存
-            $this->menus()->attach($menuData['menu_id']);
+            $this->menus()->attach($menuData['menu_id'], [
+                'servings' => $globalServings,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // 今保存した meal_plan_menu の ID を取得
             $mealPlanMenuId = \DB::table('meal_plan_menu')
@@ -97,13 +101,9 @@ class MealPlan extends Model
 
             // 中間テーブル（meal_plan_menu_item）に調整後の食材を保存
             foreach ($menuData['ingredients'] as $ingredient) {
-                // 必要量の合計を計算（1人分の必要量に提供人数を掛ける）
-                $totalAmount = $ingredient['required_amount'] * $globalServings;
-
                 \DB::table('meal_plan_menu_item')->insert([
                     'meal_plan_menu_id' => $mealPlanMenuId,
                     'item_id' => $ingredient['item_id'],
-                    'servings' => $globalServings,
                     'adjust_amount' => $ingredient['required_amount'],
                     'created_at' => now(),
                     'updated_at' => now(),

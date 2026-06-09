@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Stock;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StockRequest extends FormRequest
