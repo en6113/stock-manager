@@ -22,7 +22,6 @@ class ItemSeeder extends Seeder
                 'unit' => 'g',
                 'storage_location' => '冷蔵',
                 'menu_id' => 1,
-                'servings' => 1,
                 'required_amount' => 60,
             ],
             [
@@ -32,7 +31,6 @@ class ItemSeeder extends Seeder
                 'capacity' => '250g/個',
                 'storage_location' => '常温',
                 'menu_id' => 1,
-                'servings' => 1,
                 'required_amount' => 60,
             ],
             [
@@ -42,7 +40,6 @@ class ItemSeeder extends Seeder
                 'capacity' => '180g/個',
                 'storage_location' => '常温',
                 'menu_id' => 1,
-                'servings' => 1,
                 'required_amount' => 25,
             ],
             [
@@ -52,7 +49,6 @@ class ItemSeeder extends Seeder
                 'capacity' => '150g/個',
                 'storage_location' => '常温',
                 'menu_id' => 1,
-                'servings' => 1,
                 'required_amount' => 25,
             ],
             [
@@ -61,18 +57,15 @@ class ItemSeeder extends Seeder
                 'unit' => '箱',
                 'storage_location' => '常温',
                 'menu_id' => 1,
-                'servings' => 1,
-                'required_amount' => 1,
+                'required_amount' => 0.1,
             ],
             [
                 'name' => 'サラダ油',
                 'item_category_id' => 16,
-                'target_stock_qty' => 1000,
                 'unit' => 'g',
                 'capacity' => '1000g/本',
                 'storage_location' => '常温',
                 'menu_id' => 1,
-                'servings' => 1,
                 'required_amount' => 1,
             ],
             [
@@ -82,7 +75,6 @@ class ItemSeeder extends Seeder
                 'capacity' => '600g/玉',
                 'storage_location' => '常温',
                 'menu_id' => 2,
-                'servings' => 1,
                 'required_amount' => 70,
             ],
             [
@@ -92,7 +84,6 @@ class ItemSeeder extends Seeder
                 'capacity' => '140g/缶',
                 'storage_location' => '常温',
                 'menu_id' => 2,
-                'servings' => 1,
                 'required_amount' => 11,
             ],
             [
@@ -102,18 +93,16 @@ class ItemSeeder extends Seeder
                 'capacity' => '300g/缶',
                 'storage_location' => '常温',
                 'menu_id' => 2,
-                'servings' => 1,
                 'required_amount' => 12,
             ],
             [
                 'name' => 'ポン酢',
                 'item_category_id' => 19,
-                'unit' => 'g',
-                'capacity' => '500g/本',
+                'unit' => 'ml',
+                'capacity' => '500ml/本',
                 'storage_location' => '冷蔵',
                 'menu_id' => 2,
-                'servings' => 1,
-                'required_amount' => 1,
+                'required_amount' => 2,
             ],
             [
                 'name' => 'マヨネーズ',
@@ -123,7 +112,6 @@ class ItemSeeder extends Seeder
                 'storage_location' => '冷蔵',
                 'allergens' => ['卵', '乳'],
                 'menu_id' => 2,
-                'servings' => 1,
                 'required_amount' => 6,
             ],
         ];
@@ -154,11 +142,10 @@ class ItemSeeder extends Seeder
 
             // メニューと必要分量を中間テーブルに保存
             $menu_id = $data['menu_id'] ?? null;
-            $servings = $data['servings'] ?? null;
             $required_amount = $data['required_amount'] ?? [];
 
-            if (!is_null($menu_id) && !is_null($servings)&& !is_null($required_amount)) {
-                $item->menus()->attach([$menu_id => ['servings' => $servings, 'required_amount' => $required_amount]]);
+            if (!is_null($menu_id) && !is_null($required_amount)) {
+                $item->menus()->attach([$menu_id => ['required_amount' => $required_amount]]);
             }
         }
     }

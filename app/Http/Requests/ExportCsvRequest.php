@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ExportCsvController;
 use Illuminate\Foundation\Http\FormRequest;
+use Carbon\Carbon;
 
 class ExportCsvRequest extends FormRequest
 {
@@ -23,8 +23,17 @@ class ExportCsvRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d|after_or_equal:start_date',
         ];
+    }
+
+    // バリデーションを通過した後に実行される処理（Carbonを使って確実に Y-m-d 形式の文字列に変換してリクエストデータを上書き）
+    protected function passedValidation()
+    {
+        $this->merge([
+            'start_date' => Carbon::parse($this->start_date)->format('Y-m-d'),
+            'end_date' => Carbon::parse($this->end_date)->format('Y-m-d'),
+        ]);
     }
 }

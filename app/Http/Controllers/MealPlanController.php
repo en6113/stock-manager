@@ -85,17 +85,18 @@ class MealPlanController extends Controller
         $categories = DishCategory::all();
         $menus = Menu::all();
 
-        // 1. この献立に登録されている食材(総重量)をあらかじめ中間テーブルのIDごとに取得
+        // 1. 保存済の提供人数と食材リストを取得
+        $currentServings = \DB::table('meal_plan_menu')
+            ->where('meal_plan_id', $mealPlan->id)
+            ->value('servings') ?? 50; // データがなければデフォルト50
+
         $adjustedItems = MealPlanMenuItem::with('item')
             ->whereIn('meal_plan_menu_id', function ($query) use ($mealPlan) {
                 $query->select('id')->from('meal_plan_menu')->where('meal_plan_id', $mealPlan->id);
             })->get();
 
-        // 既存の提供人数（servings）を取得（どこか1件でも登録されていればそれを、なければデフォルト50）
-        $currentServings = $adjustedItems->first()->servings ?? 50;
-
-        // 2. カテゴリごとのデータ構造を作る（）テゴリに紐づく現在のメニューを特定）
-        $structuredData = $categories->map(function ($category) use ($mealPlan, $adjustedItems, $currentServings) {
+        // 2. ディッシュカテゴリごとのデータ構造を作る
+        $structuredData = $categories->map(function ($category) use ($mealPlan, $currentServings, $adjustedItems) {
             $currentMenu = $mealPlan->menus->where('dish_category_id', $category->id)->first();
             $ingredientsForView = [];
 
@@ -111,21 +112,24 @@ class MealPlanController extends Controller
                     $categoryAdjustedItems = $adjustedItems->where('meal_plan_menu_id', $currentMealPlanMenu->id);
 
                     foreach ($categoryAdjustedItems as $adjustedItem) {
-                        // 提供人数の変更がある可能性があるため、1人分の量に復元して渡す（総重量(adjust_amount) ÷ 提供人数）
-                        $perPersonAmount = $currentServings > 0 ? ($adjustedItem->adjust_amount / $currentServings) : 0;
+                        // 現在処理している食材（item_id）と一致するレコードを検索する
+                        $masterItem = $currentMenu->items->where('id', $adjustedItem->item_id)->first();
+
+                        // マスタに登録されている1人分の量を取得（万が一マスタから消えていた場合は0）
+                        $perPersonAmount = $masterItem ? $masterItem->pivot->required_amount : 0;
 
                         $ingredientsForView[] = [
                             'item_id' => $adjustedItem->item_id,
                             'name' => $adjustedItem->item->name,
                             'unit' => $adjustedItem->item->unit,
                             'per_person_amount' => $perPersonAmount, // 1人分
-                            'total_amount' => $adjustedItem->adjust_amount, // 総重量（初期表示用）
+                            'total_amount' => $adjustedItem->adjust_amount, // 保存されている総重量
                         ];
                     }
                 }
             }
 
-            // もしメニューはあるのに中間データがない（レアケース）場合はマスターから取得
+            // もしメニューはあるのに中間データがない場合はマスターから取得
             if ($currentMenu && empty($ingredientsForView)) {
                 foreach ($currentMenu->items as $item) {
                     $ingredientsForView[] = [
