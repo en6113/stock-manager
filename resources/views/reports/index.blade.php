@@ -13,7 +13,7 @@
 
         <div class="mb-8 border-b border-gray-200 pb-4">
             <h1 class="text-2xl font-bold text-gray-900">特定給食施設栄養報告書（様式６）データ出力</h1>
-            <p class="mt-2 text-sm text-gray-600">指定した期間の給食実施状況から、1人1日あたりの食品群別給与量を計算しCSVで出力します。</p>
+            <p class="mt-2 text-sm text-gray-600">指定した期間の食品群別給与量を計算しCSVで出力します。</p>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
@@ -23,7 +23,7 @@
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                     </path>
                 </svg>
-                CSV出力条件指定
+                出力する期間を設定
             </h2>
 
             <form action="{{ route('reports.export') }}" method="POST">
@@ -53,7 +53,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            GAS差し込み用CSVを出力
+                            CSV出力
                         </button>
                     </div>
                 </div>
