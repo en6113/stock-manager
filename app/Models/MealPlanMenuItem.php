@@ -22,4 +22,9 @@ class MealPlanMenuItem extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
+    public function mealPlanMenu()
+    {
+        return $this->belongsTo(MealPlanMenu::class, 'meal_plan_menu_id');
+    }
 }
