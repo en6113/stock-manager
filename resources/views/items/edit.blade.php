@@ -24,15 +24,13 @@
 
                             <div class="flex flex-col">
                                 <label class="leading-loose text-sm font-medium">種類</label>
-                                <select name="item_category" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
-                                    <option value="野菜類" {{ $item->item_category == '野菜類（いも類含む）' ? 'selected' : '' }}>野菜類（いも類含む）</option>
-                                    <option value="肉類" {{ $item->item_category == '肉類' ? 'selected' : '' }}>肉類</option>
-                                    <option value="魚介類" {{ $item->item_category == '魚介類' ? 'selected' : '' }}>魚介類</option>
-                                    <option value="卵類" {{ $item->item_category == '卵類' ? 'selected' : '' }}>卵類</option>
-                                    <option value="きのこ・海藻類" {{ $item->item_category == 'きのこ・海藻類' ? 'selected' : '' }}>きのこ・海藻類</option>
-                                    <option value="加工食品" {{ $item->item_category == '加工食品' ? 'selected' : '' }}>加工食品（調味料含む）</option>
-                                    <option value="果実類" {{ $item->item_category == '果実類' ? 'selected' : '' }}>果実類</option>
-                                    <option value="その他" {{ $item->item_category == 'その他' ? 'selected' : '' }}>その他</option>
+                                <select name="item_category_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" 
+                                            {{ old('item_category_id', $item->item_category_id) == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -47,14 +45,9 @@
                                     <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
                                         required>
                                         <option value="g" {{ $item->unit == 'g' ? 'selected' : '' }}>g</option>
-                                        <option value="kg" {{ $item->unit == 'kg' ? 'selected' : '' }}>kg</option>
                                         <option value="ml" {{ $item->unit == 'ml' ? 'selected' : '' }}>ml</option>
-                                        <option value="L" {{ $item->unit == 'L' ? 'selected' : '' }}>L</option>
                                         <option value="個" {{ $item->unit == '個' ? 'selected' : '' }}>個</option>
-                                        <option value="本" {{ $item->unit == '本' ? 'selected' : '' }}>本</option>
                                         <option value="パック" {{ $item->unit == 'パック' ? 'selected' : '' }}>パック</option>
-                                        <option value="ケース" {{ $item->unit == 'ケース' ? 'selected' : '' }}>ケース</option>
-                                        <option value="尾" {{ $item->unit == '尾' ? 'selected' : '' }}>尾</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
@@ -68,9 +61,11 @@
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">保管場所</label>
                                     <select name="storage_location" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
-                                        <option value="常温" {{ $item->storage_location == '常温' ? 'selected' : '' }}>常温パントリー</option>
-                                        <option value="冷蔵" {{ $item->storage_location == '冷蔵' ? 'selected' : '' }}>冷蔵庫</option>
-                                        <option value="冷凍" {{ $item->storage_location == '冷凍' ? 'selected' : '' }}>冷凍庫</option>
+                                        @foreach(App\Enums\StorageLocation::cases() as $location)
+                                                <option value="{{ $location->value }}" {{ ($item->storage_location?->value === $location->value) ? 'selected' : '' }}>
+                                                    {{ $location->label() }}
+                                                </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

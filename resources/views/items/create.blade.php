@@ -44,32 +44,28 @@
                                     <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
                                         <option value="">選択してください</option>
                                         <option value="g">g</option>
-                                        <option value="kg">kg</option>
                                         <option value="ml">ml</option>
-                                        <option value="L">L</option>
                                         <option value="個">個</option>
-                                        <option value="本">本</option>
                                         <option value="パック">パック</option>
-                                        <option value="ケース">ケース</option>
-                                        <option value="尾">尾</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">規格容量(単位の補足)</label>
                                     <input type="text" name="capacity" value="{{ old('capacity') }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
-                                        placeholder="例：1kg/本">
+                                        placeholder="例：250g/個">
                                 </div>
                             </div>
 
                             <div class="flex flex-col">
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">保管場所</label>
-                                    <select name="storage_location"
-                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
-                                        <option value="常温">常温パントリー</option>
-                                        <option value="冷蔵">冷蔵庫</option>
-                                        <option value="冷凍">冷凍庫</option>
+                                    <select name="storage_location" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                        @foreach(App\Enums\StorageLocation::cases() as $location)
+                                            <option value="{{ $location->value }}">
+                                                {{ $location->label() }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

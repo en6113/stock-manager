@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ItemRequest;
+use App\Http\Requests\IndexItemRequest;
 use App\Models\Allergen;
 use App\Models\Item;
 use App\Models\ItemCategory;
@@ -13,11 +14,16 @@ class ItemController extends Controller
     /**
      * 食材一覧を表示
      */
-    public function index()
+    public function index(IndexItemRequest $request)
     {
-        $items = Item::all();
+        $categories = ItemCategory::all();
 
-         return view('items.index', compact('items'));
+        $items = Item::orderBy('item_category_id')
+            ->keywordSearch($request->keyword)
+            ->categorySearch($request->item_category)
+            ->paginate(15);
+
+        return view('items.index', compact('categories', 'items'));
     }
 
     /**
@@ -26,8 +32,8 @@ class ItemController extends Controller
     public function create()
     {
         $categories = ItemCategory::all();
-        $vendors = Vendor::orderBy('name')->get();
-        $allergens = Allergen::orderBy('name')->get();
+        $vendors = Vendor::all();
+        $allergens = Allergen::all();
 
         return view('items.create', compact('categories','vendors', 'allergens'));
     }
@@ -52,10 +58,11 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        $vendors = Vendor::orderBy('name')->get();
-        $allergens = Allergen::orderBy('name')->get();
+        $categories = ItemCategory::all();
+        $vendors = Vendor::all();
+        $allergens = Allergen::all();
 
-        return view('items.edit', compact('item', 'vendors', 'allergens'));
+        return view('items.edit', compact('item', 'categories', 'vendors', 'allergens'));
     }
 
     /**
