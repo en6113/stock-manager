@@ -17,13 +17,18 @@ class MealPlanMenuItem extends Model
         'adjust_amount',
     ];
 
-    // この食材調整データが属する食材を取得する
-    public function item() : belongsTo
+    /*
+     * この献立メニュー詳細が属する食材
+    */
+    public function item() : BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
 
-    public function mealPlanMenu()
+    /*
+     * この献立メニュー詳細が属する献立メニュー
+     */
+    public function mealPlanMenu() : BelongsTo
     {
         return $this->belongsTo(MealPlanMenu::class, 'meal_plan_menu_id');
     }
