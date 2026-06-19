@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('unit');
             $table->string('capacity')->nullable();
             $table->string('storage_location');
+            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
