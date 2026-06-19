@@ -22,13 +22,13 @@ class Menu extends Model
         'calorie',
     ];
 
-    // メニューは特定のカテゴリに属する
+    // このメニューが属するディッシュカテゴリー（多対１）
     public function dishCategory(): BelongsTo
     {
         return $this->belongsTo(DishCategory::class);
     }
 
-    // このメニューに属する食材を取得
+    // このメニューに関連する食材（多対多）
     public function items() : BelongsToMany
     {
         return $this->belongsToMany(Item::class,'item_menu', 'menu_id', 'item_id')

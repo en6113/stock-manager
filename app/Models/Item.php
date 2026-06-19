@@ -56,9 +56,17 @@ class Item extends Model
     /**
      * この食材が登録されているメニュー（多対多）
      */
-    public function menus(): belongsToMany
+    public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class,'item_menu');
+    }
+
+    /**
+     * この食材に紐づく献立メニュー詳細（1対多）
+     */
+    public function mealPlanMenuItems(): HasMany
+    {
+        return $this->HasMany(MealPlanMenuItem::class);
     }
 
     /**
@@ -101,5 +109,49 @@ class Item extends Model
         }
 
         return $query->where('item_category_id', $category);
+    }
+
+    /**
+     * スコープ：使用予定量（明日以降の献立メニューで使用する量）
+     */
+    public function scopeWithReservedQty($query) :Builder
+    {
+        return $query->withSum(['mealPlanMenuItems as reserved_qty' => function($q) {
+            $q->whereHas('mealPlanMenu.mealPlan', function($subQ) {
+                $subQ->where('date', '>=', now()->toDateString());
+            });
+        }], 'adjust_amount');
+    }
+
+    /**
+     * スコープ：納品済の数量（発注量のうち、ステータスが2:納品済のもの）
+     */
+    public function scopeWithReceivedQty($query) :Builder
+    {
+        return $query->withSum(['orders as received_qty' => function ($q) {
+                $q->where('status', '2');
+        }], 'ordered_qty');
+    }
+
+    /**
+     * スコープ：調理済みの数量（今日までの献立メニューで使用した量）
+     */
+    public function scopeWithCookedQty($query) :Builder
+    {
+        return $query->withSum(['mealPlanMenuItems as cooked_qty' => function ($q) {
+                $q->whereHas('mealPlanMenu.mealPlan', function ($subQ) {
+                    $subQ->where('date', '<', now()->toDateString());
+                });
+        }], 'adjust_amount');
+    }
+
+    /**
+     * スコープ：発注中の量（発注済量のうち、ステータスが1:発注中のもの）
+     */
+    public function scopeWithOrderedQty($query) :Builder
+    {
+        return $query->withSum(['orders as ordered_qty' => function ($q) {
+                $q->where('status', '1');
+        }], 'ordered_qty');
     }
 }
