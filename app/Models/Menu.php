@@ -16,7 +16,6 @@ class Menu extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'dish_category_id',
         'name',
         'calorie',
@@ -32,7 +31,7 @@ class Menu extends Model
     public function items() : BelongsToMany
     {
         return $this->belongsToMany(Item::class,'item_menu', 'menu_id', 'item_id')
-            ->withPivot('required_amount');
+            ->withPivot('required_amount', 'servings');
     }
 
     /**

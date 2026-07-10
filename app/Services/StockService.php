@@ -33,7 +33,7 @@ class StockService
             $item->calculated_stock_qty = $received - $cooked;
 
             // 発注の必要性判定
-            $item->is_low_stock = ($item->calculated_stock_qty + $ordered) < ($reserved + ($item->target_stock_qty ?? 0));
+            $item->is_low_stock = ($item->calculated_stock_qty + $ordered) <= ($reserved + ($item->target_stock_qty ?? 0));
 
             // 在庫データの存在判定
             $item->has_stock = $item->stock_count > 0;

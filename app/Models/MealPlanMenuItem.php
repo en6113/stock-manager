@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Item;
-use App\Models\MealPlan;
+use App\Models\MealPlanMenu;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 

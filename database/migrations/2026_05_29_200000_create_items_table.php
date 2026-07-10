@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->integer('item_category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('item_category_id')->constrained()->cascadeOnDelete();
             $table->integer('target_stock_qty')->nullable();
             $table->string('unit');
             $table->string('capacity')->nullable();
