@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('servings')->default(1);
             $table->decimal('required_amount', 8, 1);
             $table->timestamps();
+            $table->unique(['item_id', 'menu_id']);
         });
     }
 
