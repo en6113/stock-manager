@@ -32,7 +32,7 @@ en6113
 
 ## ER図
 
-![ER図](\docs\images\erd_20260605.png)
+![ER図](docs/images/erd_20260605.png)
 
 ## 動作環境
 
