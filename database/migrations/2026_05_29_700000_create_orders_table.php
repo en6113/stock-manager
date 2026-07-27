@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
-            $table->string('status')->default('pending'); // 'pending': 未発注, 'ordered': 発注済, 'received': 納品済
             $table->integer('ordered_qty')->default(0); // 発注中数量
             $table->date('ordered_date')->nullable();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete()->nullable();
+            $table->foreignId('vendor_id')->nullable()->constrained()->nullOnDelete();
+            $table->integer('received_qty')->nullable();
             $table->date('received_date')->nullable();
             $table->date('expiration_date')->nullable();
             $table->string('lot_number')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

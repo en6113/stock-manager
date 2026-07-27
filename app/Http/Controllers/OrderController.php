@@ -18,7 +18,7 @@ class OrderController extends Controller
         $orders = Order::with('item','vendor')
             ->statusSearch($request->status)
             ->vendorSearch($request->vendor_id)
-            ->latest('ordered_date',)
+            ->latest('ordered_date')
             ->paginate(10);
 
         $vendors = Vendor::all();
@@ -41,20 +41,10 @@ class OrderController extends Controller
      */
     public function store(OrderRequest $request)
     {
-        $order = new Order();
-        $order->fill($request->validated());
+        Order::create($request->validated());
 
-        if (!empty($order->received_date)) {
-            $order->status = '2'; // 納品済
-        } elseif (!empty($order->ordered_date)) {
-            $order->status = '1'; // 発注済
-        } else {
-            $order->status = '0'; // 未発注
-        }
-
-        $order->save();
-
-        return redirect()->route('orders.index')->with('success', '発注・納品記録を登録しました。');
+        return redirect()->route('orders.index')
+            ->with('success', '発注・納品記録を登録しました。');
     }
 
     /**
@@ -72,7 +62,7 @@ class OrderController extends Controller
 
         $item = $order->item;
 
-        return view('orders.edit', compact('vendors','orders', 'item'));
+        return view('orders.edit', compact('vendors', 'orders', 'item'));
     }
 
     /**
@@ -80,19 +70,10 @@ class OrderController extends Controller
      */
     public function update(OrderRequest $request, Order $order)
     {
-        $order->fill($request->validated()); // statusの自動判定ロジックを動かすためにfill()を使用
+        $order->update($request->validated());
 
-        if (!empty($order->received_date)) {
-            $order->status = '2'; // 納品済
-        } elseif (!empty($order->ordered_date)) {
-            $order->status = '1'; // 発注済
-        } else {
-            $order->status = '0'; // 未発注
-        }
-
-        $order->save();
-
-        return redirect()->route('stocks.index')->with('success', '発注・納品記録を更新しました。');
+        return redirect()->route('stocks.index')
+            ->with('success', '発注・納品記録を更新しました。');
     }
 
     /**
@@ -102,6 +83,7 @@ class OrderController extends Controller
     {
         $order->delete();
 
-        return redirect()->route('stocks.index')->with('success', '発注・納品記録を削除しました。');
+        return redirect()->route('stocks.index')
+            ->with('success', '発注・納品記録を削除しました。');
     }
 }
