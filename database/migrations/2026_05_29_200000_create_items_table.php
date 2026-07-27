@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->foreignId('item_category_id')->constrained()->cascadeOnDelete();
-            $table->integer('target_stock_qty')->nullable();
+            $table->integer('proper_inventory')->nullable();
             $table->string('unit');
             $table->string('capacity')->nullable();
             $table->string('storage_location');

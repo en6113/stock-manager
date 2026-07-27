@@ -17,8 +17,8 @@
                         <tr class="bg-gray-50 border-b border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             <th class="px-4 py-3 w-60">食材名 / アレルギー</th>
                             <th class="px-4 py-3 w-28">保管場所</th>
-                            <th class="px-4 py-3 w-28">使用予定量</th>
-                            <th class="px-4 py-3 w-28 text-blue-600">在庫数</th>
+                            <th class="px-4 py-3 w-28">必要量</th>
+                            <th class="px-4 py-3 w-28 text-blue-600">在庫</th>
                             <th class="px-4 py-3 w-28">発注中</th>
                             <th class="px-4 py-3 w-28">発注の必要性</th>
                             <th class="px-4 py-3 w-48">操作</th>
@@ -41,11 +41,11 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-gray-500 text-center">
-                                    {{ $item->storage_location }}
+                                    {{ $item->storage_location->label() }}
                                 </td>
 
                                 <td class="px-4 py-3 text-gray-500 text-right">
-                                    {{ number_format($item->reserved_qty ?? 0, 1) }} <span class="text-xs">{{ $item->unit }}</span>
+                                    {{ number_format($item->required_qty ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
                                 </td>
 
                                 <form action="{{ $item->has_stock ? route('stocks.update', $item->stock->id) : route('stocks.store') }}" method="POST">
@@ -65,7 +65,7 @@
                                     </td>
 
                                     <td class="px-4 py-3 text-gray-500 text-right">
-                                        {{ number_format($item->ordered_qty ?? 0, 1) }} <span class="text-xs">{{ $item->unit }}</span>
+                                        {{ number_format($item->pending_ordered_qty ?? 0, 1) }} <span class="text-xs">{{ $item->unit }}</span>
                                     </td>
 
                                     <td class="px-4 py-3 text-center">

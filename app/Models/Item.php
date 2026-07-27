@@ -18,7 +18,7 @@ class Item extends Model
     protected $fillable = [
         'name',
         'item_category_id',
-        'target_stock_qty',
+        'proper_inventory',
         'unit',
         'capacity',
         'storage_location',
@@ -112,15 +112,27 @@ class Item extends Model
     }
 
     /**
-     * スコープ：使用予定量（明日以降の献立メニューで使用する量）
+     * スコープ：必要量（明日以降の献立メニューで使用する量）
      */
-    public function scopeWithReservedQty($query) :Builder
+    public function scopeWithRequiredQty($query) :Builder
     {
-        return $query->withSum(['mealPlanMenuItems as reserved_qty' => function($q) {
+        return $query->withSum(['mealPlanMenuItems as required_qty' => function($q) {
             $q->whereHas('mealPlanMenu.mealPlan', function($subQ) {
                 $subQ->where('date', '>=', now()->toDateString());
             });
         }], 'adjust_amount');
+    }
+
+    /**
+     * スコープ：発注中の量（発注量のうち、ステータスが1:発注中（未納品）のもの）
+     */
+    public function scopeWithOrderedQty($query): Builder
+    {
+        return $query->withSum([
+            'orders as pending_ordered_qty' => function ($q) {
+                $q->where('status', '1');
+            }
+        ], 'ordered_qty');
     }
 
     /**
@@ -134,7 +146,7 @@ class Item extends Model
     }
 
     /**
-     * スコープ：調理済みの数量（今日までの献立メニューで使用した量）
+     * スコープ：調理済の数量（今日までの献立メニューで使用した量）
      */
     public function scopeWithCookedQty($query) :Builder
     {
@@ -143,15 +155,5 @@ class Item extends Model
                     $subQ->where('date', '<', now()->toDateString());
                 });
         }], 'adjust_amount');
-    }
-
-    /**
-     * スコープ：発注中の量（発注済量のうち、ステータスが1:発注中のもの）
-     */
-    public function scopeWithOrderedQty($query) :Builder
-    {
-        return $query->withSum(['orders as ordered_qty' => function ($q) {
-                $q->where('status', '1');
-        }], 'ordered_qty');
     }
 }
