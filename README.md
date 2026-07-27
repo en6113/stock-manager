@@ -1,66 +1,153 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# StockManager 給食・在庫管理アプリ
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+給食の献立作成及び食材の在庫を管理するためのLaravelプロジェクトです。
+行政に提出する栄養報告書を作成するためのcsv出力機能（GASを使用）も備えています。
 
-## About Laravel
+## 作成者
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+en6113
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 使用技術
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🛠️ バックエンド
+- PHP 8.2.x
+- Laravel 10.x
+  - Laravel Fortify (認証機能)
 
-## Learning Laravel
+### 💻 フロントエンド
+- Blade(テンプレートエンジン)
+- Tailwind CSS 3.4
+- Vite（ビルドツール）
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🗄️ データベース
+- MySQL 8.4
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🔌 外部連携
+- Google Apps Script
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🐳 インフラ / 開発環境
+- Docker / Docker Compose
+- Nginx (Webサーバー)
+- phpMyAdmin (データベース管理ツール)
 
-## Laravel Sponsors
+## ER図
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+![ER図](\docs\images\erd_20260605.png)
 
-### Premium Partners
+## 動作環境
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- Docker
+- Docker Compose
 
-## Contributing
+※ Windowsの場合はWSL2の利用を推奨します。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 環境構築手順
 
-## Code of Conduct
+1. **リポジトリのクローン**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    git clone git@github.com:en6113/stock-manager.git
+    ```
 
-## Security Vulnerabilities
+2. **.envファイルの準備**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    `.env.example` をコピーして `.env` を作成します。
 
-## License
+    ```bash
+    cp .env.example .env
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    `.env` ファイル内の以下のDB接続情報が以下と一致していることを確認してください。
+
+    ```ini
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=laravel
+    DB_USERNAME=sail
+    DB_PASSWORD=password
+    ```
+
+3. **Composer依存パッケージのインストール**
+
+    プロジェクトの初回セットアップ時は、`vendor` ディレクトリが存在しないため `sail` コマンドを使用できません。
+    以下のDockerコマンドを実行して、コンテナ内で `composer install` を実行します。
+
+    ```bash
+    docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    -e COMPOSER_CACHE_DIR=/tmp/composer_cache \
+    laravelsail/php82-composer:latest \
+    composer install
+    ```
+
+4. **Laravel Sailの起動**
+
+    以下のコマンドでDockerコンテナを起動します。
+
+    ```bash
+    ./vendor/bin/sail up -d
+    ```
+
+5. **エイリアスの設定**
+
+    ```bash
+    alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+    ```
+
+6. **アプリケーションキーの生成**
+
+    ```bash
+    sail artisan key:generate
+    ```
+
+7. **データベースのマイグレーションと初期データ投入**
+
+    以下のコマンドでテーブルを作成し、ダミーデータを投入します。
+
+    ```bash
+    sail artisan migrate:fresh --seed
+    ```
+    このコマンドの入力後、コンテナ内にデータが残っており、エラーが生じているケースなどがあります。
+    その場合は、以下のコマンドを順に実行して各コンテナを再起動して下さい。
+    ```bash
+    sail down -v
+    sail up -d
+    sail artisan migrate:fresh --seed
+    ```
+
+8. **フロントエンドの準備**
+
+    ```bash
+    sail npm install
+    sail npm run dev
+    ```
+
+    `npm run dev` は開発中は起動したままにしてください。
+
+9. **アプリケーションへのアクセス**
+
+    ブラウザで [http://localhost](http://localhost) にアクセスします。
+
+## 開発環境URL
+
+http://localhost
+
+## 機能一覧
+
+#### アカウント機能
+- ユーザー登録 / ログイン / ログアウト(Laravel Fortify)
+#### 食材管理機能
+- 食材一覧表示(キーワード検索・カテゴリ検索) / 登録/ 編集 / 削除
+#### メニュー管理機能
+- メニュー一覧表示(キーワード検索・カテゴリ検索) / 登録/ 編集 / 削除
+#### 献立管理機能
+- 献立一覧表示（月ごとのページネーション） / 登録 / 編集 / 削除
+#### 発注・納品履歴管理機能
+- 発注・納品情報一覧表示(ステータス検索・発注業者検索) / 登録 / 編集 / 削除
+#### 在庫管理機能
+- 在庫一覧表示 / 更新
+#### 栄養報告書作成補助機能
+- 指定期間の献立に含まれる栄養素をCSV出力
