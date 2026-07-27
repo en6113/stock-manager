@@ -128,11 +128,9 @@ class Item extends Model
      */
     public function scopeWithOrderedQty($query): Builder
     {
-        return $query->withSum([
-            'orders as pending_ordered_qty' => function ($q) {
-                $q->where('status', '1');
-            }
-        ], 'ordered_qty');
+        return $query->withSum(['orders as pending_ordered_qty' => function ($q) {
+                $q->whereNull('received_date')->whereNotNull('ordered_date');
+        }], 'ordered_qty');
     }
 
     /**
@@ -141,7 +139,7 @@ class Item extends Model
     public function scopeWithReceivedQty($query) :Builder
     {
         return $query->withSum(['orders as received_qty' => function ($q) {
-                $q->where('status', '2');
+            $q->whereNotNull('received_date');
         }], 'ordered_qty');
     }
 

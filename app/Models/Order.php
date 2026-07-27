@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use App\Models\Item;
 use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'item_id',
-        'status',
         'ordered_qty',
         'ordered_date',
         'vendor_id',
@@ -26,7 +27,6 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'status' => 'integer',
         'ordered_date' => 'date',
         'received_date' => 'date',
     ];
@@ -50,13 +50,14 @@ class Order extends Model
     /**
      * ステータス検索スコープ
      */
-    public function scopeStatusSearch(Builder $query, ?int $status): Builder
+    public function scopeStatusSearch(Builder $query, ?string $status): Builder
     {
-        if (blank($status)) { // blank():値が空文字やnullの場合にクエリをそのまま返す
-            return $query;
-        }
-
-        return $query->where('status', $status);
+        return match ($status) {
+            'received' => $query->whereNotNull('received_date'),
+            'ordered' => $query->whereNull('received_date')->whereNotNull('ordered_date'),
+            'pending' => $query->whereNull('ordered_date'),
+            default => $query,
+        };
     }
 
     /**
@@ -77,15 +78,11 @@ class Order extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            set: function ($value, $attributes) {
-                // 日付の入力状況から自動判定して上書き
-                if (!empty($attributes['received_date'])) {
-                    return '2';
-                } elseif (!empty($attributes['ordered_date'])) {
-                    return '1';
-                }
-                return '0';
-            }
+            get: fn () => match(true) {
+                filled($this->received_date) => OrderStatus::Received,
+                filled($this->ordered_date) => OrderStatus::Ordered,
+                default => OrderStatus::Pending,
+            },
         );
     }
 }

@@ -16,7 +16,7 @@
             </p>
             <p class="text-sm text-gray-600 mt-1">
                 現時点における使用予定量: <span class="font-bold text-gray-900">調整中{{ $item->unit }}</span>
-            </p>        
+            </p>
         </div>
 
         {{-- 該当の食材に紐づくorderデータだけをループ表示 --}}
@@ -27,13 +27,9 @@
                     {{-- 識別用のインデックス --}}
                     <div class="mb-4 pb-2 border-b border-gray-100 flex justify-between items-center text-xs text-gray-500">
                         <div class="py-2 font-semibold text-sm flex items-center gap-2">
-                            @if(old('status', $order->status) == '0')
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">0: 未発注 (pending)</span>
-                            @elseif(old('status', $order->status) == '1')
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">1: 発注済 (ordered)</span>
-                            @elseif(old('status', $order->status) == '2')
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">2: 納品済 (received)</span>
-                            @endif
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $order->status->colorClass() }}">
+                            {{ $order->status->label() }}
+                        </span>
                         </div>
                         <span>発注日:
                             {{ $order->ordered_date ? \Carbon\Carbon::parse($order->ordered_date)->format('Y/m/d') : '未設定' }}</span>

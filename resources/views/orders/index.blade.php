@@ -22,9 +22,9 @@
                     <label for="filter_status" class="block text-xs font-medium text-gray-600 mb-1">ステータス</label>
                     <select name="status" id="filter_status" class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm">
                         <option value="">すべて</option>
-                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>0: 未発注</option>
-                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>1: 発注済</option>
-                        <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>2: 納品済</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>未発注</option>
+                        <option value="ordered" {{ request('status') === 'ordered' ? 'selected' : '' }}>発注済</option>
+                        <option value="received" {{ request('status') === 'received' ? 'selected' : '' }}>納品済</option>
                     </select>
                 </div>
                 {{-- 発注業者検索 --}}
@@ -71,13 +71,9 @@
                             <tr class="hover:bg-gray-50 transition duration-100">
                                 {{-- ステータス --}}
                                 <td class="py-3 px-4 whitespace-nowrap">
-                                    @if($order->status == '0')
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">未発注</span>
-                                    @elseif($order->status == '1')
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">発注済</span>
-                                    @elseif($order->status == '2')
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">納品済</span>
-                                    @endif
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $order->status->colorClass() }}">
+                                        {{ $order->status->label() }}
+                                    </span>
                                 </td>
                                 {{-- 食材名 --}}
                                 <td class="py-3 px-4 font-medium text-gray-900">
@@ -124,7 +120,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             {{-- ページネーション（ロジックの組みがいポイント） --}}
             @if($orders->hasPages())
                 <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
