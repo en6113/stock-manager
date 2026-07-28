@@ -70,11 +70,11 @@ class Item extends Model
     }
 
     /**
-     * この食材の在庫情報（1対1）
+     * この食材の在庫調整（1対1）
      */
-    public function stock(): HasOne
+    public function stockAdjustments(): HasMany
     {
-        return $this->hasOne(Stock::class);
+        return $this->hasMany(StockAdjustment::class);
     }
 
     /**
@@ -118,7 +118,7 @@ class Item extends Model
     {
         return $query->withSum(['mealPlanMenuItems as required_qty' => function($q) {
             $q->whereHas('mealPlanMenu.mealPlan', function($subQ) {
-                $subQ->where('date', '>=', now()->toDateString());
+                $subQ->where('date', '>', now()->toDateString());
             });
         }], 'adjust_amount');
     }
@@ -153,5 +153,13 @@ class Item extends Model
                     $subQ->where('date', '<', now()->toDateString());
                 });
         }], 'adjust_amount');
+    }
+
+    /**
+     * スコープ：調整合計
+     */
+    public function scopeWithAdjustedQty($query): Builder
+    {
+        return $query->withSum('stockAdjustments as adjusted_qty', 'quantity_g');
     }
 }

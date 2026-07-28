@@ -4,10 +4,16 @@
             <div>
                 <h1 class="text-2xl font-semibold text-gray-800 leading-tight">給食食材・在庫管理</h1>
             </div>
-            <a href="{{ route('items.create') }}"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-150 text-sm">
-                ＋ マスタに新しい食材を追加
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('stock_adjustments.index') }}"
+                    class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition duration-150 text-sm">
+                    在庫調整履歴
+                </a>
+                <a href="{{ route('items.create') }}"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition duration-150 text-sm">
+                    ＋ マスタに新しい食材を追加
+                </a>
+            </div>
         </div>
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
@@ -48,50 +54,38 @@
                                     {{ number_format($item->required_qty ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
                                 </td>
 
-                                <form action="{{ $item->has_stock ? route('stocks.update', $item->stock->id) : route('stocks.store') }}" method="POST">
-                                    @csrf
-                                    @if($item->has_stock)
-                                        @method('PUT')
+                                <td class="px-4 py-3 text-blue-500 text-right">
+                                    {{ number_format($item->current_stock ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-500 text-right">
+                                    {{ number_format($item->pending_ordered_qty ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
+                                </td>
+
+                                <td class="px-4 py-3 text-center">
+                                    @if($item->is_low_stock)
+                                        <span class="inline-flex items-center text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded">
+                                            要発注
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded">
+                                            なし
+                                        </span>
                                     @endif
-                                    <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                </td>
 
-                                    <td class="px-4 py-3">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <input type="number" name="qty" step="0.1"
-                                                class="w-20 rounded border-gray-300 py-1 px-2 text-sm text-left focus:border-indigo-500 focus:ring-indigo-500"
-                                                value="{{ old('qty', $item->calculated_stock_qty) }}" placeholder="0">
-                                            <span class="text-xs text-gray-500">{{ $item->unit }}</span>
-                                        </div>
-                                    </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                        <a href="{{ route('stock_adjustments.create', $item->id) }}"
+                                            class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2.5 rounded text-xs transition shadow-sm">
+                                            調整
+                                        </a>
 
-                                    <td class="px-4 py-3 text-gray-500 text-right">
-                                        {{ number_format($item->pending_ordered_qty ?? 0, 1) }} <span class="text-xs">{{ $item->unit }}</span>
-                                    </td>
-
-                                    <td class="px-4 py-3 text-center">
-                                        @if($item->is_low_stock)
-                                            <span class="inline-flex items-center text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded">
-                                                要発注
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded">
-                                                なし
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-4 py-3 text-center">
-                                        <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
-                                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2.5 rounded text-xs transition shadow-sm">
-                                                更新
-                                            </button>
-
-                                            <a href="{{ route('orders.create', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[70px] inline-block text-center leading-tight">
-                                                発注・管理
-                                            </a>
-                                        </div>
-                                    </td>
-                                </form>
+                                        <a href="{{ route('orders.create', $item->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded text-xs transition shadow-sm whitespace-normal max-w-[70px] inline-block text-center leading-tight">
+                                            発注・管理
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         @empty
                             <tr>

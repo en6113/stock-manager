@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AdjustmentReason;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StockRequest extends FormRequest
+class IndexStockAdjustmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +24,9 @@ class StockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vendor_id' => 'required|integer|exists:vendors.id',
-            'stock' => 'required|integer|min:0',
+            'adjusted_on' => 'nullable|date',
+            'item_id' => 'nullable|integer|exists:items,id',
+            'reason' => ['nullable',Rule::enum(AdjustmentReason::class)],
         ];
     }
 }

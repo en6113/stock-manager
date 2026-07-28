@@ -31,7 +31,7 @@ class ItemRequest extends FormRequest
                 Rule::unique('items', 'name')->ignore($this->item),
             ],
             'item_category_id' => 'required|integer',
-            'target_stock_qty' => 'nullable|integer',
+            'proper_inventory' => 'nullable|integer',
             'unit' => 'required|string|max:30',
             'capacity' => 'nullable|string|max:30',
             'storage_location' => 'required|string|max:30',

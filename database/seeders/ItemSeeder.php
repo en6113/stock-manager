@@ -23,7 +23,7 @@ class ItemSeeder extends Seeder
                 'unit' => 'g',
                 'storage_location' => StorageLocation::REFRIGERATOR,
                 'vendor_id' => 3,
-                'menu_id' => 1,
+                'menu_id' => [1, 3],
                 'required_amount' => 60,
             ],
             [
@@ -33,7 +33,7 @@ class ItemSeeder extends Seeder
                 'capacity' => '250g/個',
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => 1,
+                'menu_id' => [1, 3, 5],
                 'required_amount' => 60,
             ],
             [
@@ -43,7 +43,7 @@ class ItemSeeder extends Seeder
                 'capacity' => '180g/個',
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => 1,
+                'menu_id' => [1, 3],
                 'required_amount' => 25,
             ],
             [
@@ -53,7 +53,7 @@ class ItemSeeder extends Seeder
                 'capacity' => '150g/個',
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => 1,
+                'menu_id' => [1, 3],
                 'required_amount' => 25,
             ],
             [
@@ -72,7 +72,7 @@ class ItemSeeder extends Seeder
                 'capacity' => '1000g/本',
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 1,
-                'menu_id' => 1,
+                'menu_id' => [1, 3],
                 'required_amount' => 1,
             ],
             [
@@ -112,7 +112,7 @@ class ItemSeeder extends Seeder
                 'capacity' => '500ml/本',
                 'storage_location' => StorageLocation::REFRIGERATOR,
                 'vendor_id' => 1,
-                'menu_id' => 2,
+                'menu_id' => [2, 4],
                 'required_amount' => 2,
             ],
             [
@@ -125,83 +125,6 @@ class ItemSeeder extends Seeder
                 'allergens' => ['卵', '乳'],
                 'menu_id' => 2,
                 'required_amount' => 6,
-            ],
-            [
-                'name' => '牛肉（こま切れ）',
-                'item_category_id' => 2,
-                'unit' => 'g',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 3,
-                'menu_id' => 3,
-                'required_amount' => 60,
-            ],
-            [
-                'name' => 'ごぼう',
-                'item_category_id' => 6,
-                'unit' => 'g',
-                'capacity' => '100g/本',
-                'storage_location' => StorageLocation::PANTRY,
-                'vendor_id' => 2,
-                'menu_id' => 3,
-                'required_amount' => 20,
-            ],
-            [
-                'name' => 'こんにゃく',
-                'item_category_id' => 8,
-                'unit' => 'g',
-                'capacity' => '100g/個',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 1,
-                'menu_id' => 3,
-                'required_amount' => 20,
-            ],
-            [
-                'name' => 'きゅうり',
-                'item_category_id' => 5,
-                'unit' => 'g',
-                'capacity' => '90g/本',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 2,
-                'menu_id' => 4,
-                'required_amount' => 30,
-            ],
-            [
-                'name' => 'しらす干し',
-                'item_category_id' => 1,
-                'unit' => 'g',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 4,
-                'menu_id' => 4,
-                'required_amount' => 30,
-            ],
-            [
-                'name' => '乾燥わかめ',
-                'item_category_id' => 7,
-                'unit' => 'g',
-                'storage_location' => StorageLocation::PANTRY,
-                'vendor_id' => 1,
-                'menu_id' => 4,
-                'required_amount' => 10,
-            ],
-            [
-                'name' => '豆腐',
-                'item_category_id' => 13,
-                'unit' => 'g',
-                'capacity' => '200g/丁',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 1,
-                'menu_id' => 5,
-                'required_amount' => 30,
-            ],
-            [
-                'name' => 'みそ',
-                'item_category_id' => 15,
-                'unit' => 'g',
-                'capacity' => '1000g/パック',
-                'storage_location' => StorageLocation::REFRIGERATOR,
-                'vendor_id' => 1,
-                'menu_id' => 5,
-                'required_amount' => 10,
             ],
         ];
 
@@ -231,11 +154,15 @@ class ItemSeeder extends Seeder
             }
 
             // メニューと必要分量を中間テーブルに保存
-            $menu_id = $data['menu_id'] ?? null;
-            $required_amount = $data['required_amount'] ?? [];
+            $menuIds = (array) ($data['menu_id'] ?? []);
+            $requiredAmount = $data['required_amount'] ?? [];
 
-            if (!is_null($menu_id) && !is_null($required_amount)) {
-                $item->menus()->attach([$menu_id => ['required_amount' => $required_amount]]);
+            if (!empty($menuIds) && !is_null($requiredAmount)) {
+                $syncData = [];
+                foreach ($menuIds as $menuId) {
+                    $syncData[$menuId] = ['required_amount' => $requiredAmount];
+                }
+                $item->menus()->attach($syncData);
             }
         }
     }
