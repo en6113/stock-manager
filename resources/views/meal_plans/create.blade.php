@@ -20,32 +20,141 @@
             </div>
         </div>
 
-        @foreach($categories as $category)
-            <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $category->id }}">
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">主菜</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Main->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    onchange="loadMenuIngredients(this, '{{ \App\Enums\DishCategory::Main->value }}')">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Main) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
 
-                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-
-                    <select name="menus[{{ $category->id }}][menu_id]"
-                        class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        onchange="loadMenuIngredients(this, {{ $category->id }})">
-                        <option value="">-- メニューを選択してください --</option>
-
-                        @foreach($menus->where('dish_category_id', $category->id) as $menu)
-                            <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-unit="{{ $item->unit }}">{{ $item->name }}</option>
                         @endforeach
                     </select>
-                </div>
-
-                <div class="ingredient-adjustment-area hidden">
-                    <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
-                    <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
-                    </div>
+                    <button type="button"
+                        class="bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap"
+                        onclick="addIngredientRow(this, '{{ \App\Enums\DishCategory::Main->value }}')">
+                        + 食材を追加
+                    </button>
                 </div>
             </div>
-        @endforeach
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">副菜</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Side->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    onchange="loadMenuIngredients(this, '{{ \App\Enums\DishCategory::Side->value }}')">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Side) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+        
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-unit="{{ $item->unit }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap"
+                        onclick="addIngredientRow(this, '{{ \App\Enums\DishCategory::Side->value }}')">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">汁もの</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Soup->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    onchange="loadMenuIngredients(this, '{{ \App\Enums\DishCategory::Soup->value }}')">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Soup) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+        
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-unit="{{ $item->unit }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap"
+                        onclick="addIngredientRow(this, '{{ \App\Enums\DishCategory::Soup->value }}')">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">その他</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Other->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    onchange="loadMenuIngredients(this, '{{ \App\Enums\DishCategory::Other->value }}')">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Other) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+        
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-unit="{{ $item->unit }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap"
+                        onclick="addIngredientRow(this, '{{ \App\Enums\DishCategory::Other->value }}')">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div class="flex justify-end space-x-4">
             <a href="{{ route('meal_plans.index') }}"
@@ -91,7 +200,7 @@
             const totalAmount = ing.required_amount * currentServings;
 
             const html = `
-                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
                     <div class="flex-1">
                         <span class="font-medium text-gray-8xl">${ing.item_name}</span>
                         <span class="text-xs text-red-500 ml-2">${ing.allergens ? '（アレルギー: ' + ing.allergens + '）' : ''}</span>
@@ -100,18 +209,69 @@
                         <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${ing.item_id}">
 
                         <label class="text-xs text-gray-500">必要量:</label>
-                        <input type="number" 
-                                name="menus[${categoryId}][ingredients][${index}][required_amount]" 
-                                data-per-person="${ing.required_amount}" 
-                                value="${totalAmount}" 
+                        <input type="number"
+                                name="menus[${categoryId}][ingredients][${index}][required_amount]"
+                                data-per-person="${ing.required_amount}"
+                                value="${totalAmount}"
                                 class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
                                 min="0" step="0.1">
                         <span class="text-gray-600 text-xs w-8">${ing.unit}</span>
+                        <button type="button" class="text-red-500 hover:text-red-700 text-xs ml-2" onclick="this.closest('.ingredient-row').remove()">削除</button>
                     </div>
                 </div>
             `;
             ingredientList.insertAdjacentHTML('beforeend', html);
         });
+    }
+
+    // ★ 新機能：メニューに無い食材を追加する
+    function addIngredientRow(buttonEl, categoryId) {
+        const row = buttonEl.closest('.add-item-row');
+        const select = row.querySelector('.add-item-select');
+        const itemId = select.value;
+
+        if (!itemId) {
+            return;
+        }
+
+        const section = buttonEl.closest('.category-section');
+        const ingredientList = section.querySelector('.ingredient-list');
+
+        // すでに同じ食材が追加されていないかチェック
+        const alreadyAdded = Array.from(ingredientList.querySelectorAll('input[type="hidden"]'))
+            .some(input => input.value === itemId);
+        if (alreadyAdded) {
+            alert('すでに追加されている食材です。');
+            return;
+        }
+
+        const selectedOption = select.options[select.selectedIndex];
+        const itemName = selectedOption.getAttribute('data-name');
+        const unit = selectedOption.getAttribute('data-unit');
+        const index = `new_${Date.now()}`; // 既存のindexと衝突しないユニークなキー
+
+        const html = `
+            <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
+                <div class="flex-1">
+                    <span class="font-medium text-gray-8xl">${itemName}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${itemId}">
+
+                    <label class="text-xs text-gray-500">必要量:</label>
+                    <input type="number"
+                            name="menus[${categoryId}][ingredients][${index}][required_amount]"
+                            data-per-person="0"
+                            value="0"
+                            class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
+                            min="0" step="0.1">
+                    <span class="text-gray-600 text-xs w-8">${unit}</span>
+                    <button type="button" class="text-red-500 hover:text-red-700 text-xs ml-2" onclick="this.closest('.ingredient-row').remove()">削除</button>
+                </div>
+            </div>
+        `;
+        ingredientList.insertAdjacentHTML('beforeend', html);
+        select.value = '';
     }
 
     // ★ 新機能：提供人数（servings）が変更されたら、画面上の全食材の必要量を一斉に再計算する

@@ -25,7 +25,7 @@
                             </div>
 
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">種類</label>
+                                <label class="leading-loose text-sm font-medium">カテゴリー</label>
                                 <select name="item_category_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -41,19 +41,19 @@
                                 </div>
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">単位</label>
-                                    <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
-                                        <option value="">選択してください</option>
-                                        <option value="g">g</option>
-                                        <option value="ml">ml</option>
-                                        <option value="個">個</option>
-                                        <option value="パック">パック</option>
+                                    <select name="purchase_unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                        @foreach(App\Enums\ItemPurchaseUnit::cases() as $purchaseUnit)
+                                            <option value="{{ $purchaseUnit->value }}">
+                                                {{ $purchaseUnit->label() }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">規格容量(単位の補足)</label>
-                                    <input type="text" name="capacity" value="{{ old('capacity') }}"
+                                    <label class="leading-loose text-sm font-medium">規格容量(g/単位)</label>
+                                    <input type="integer" name="unit_to_gram" value="{{ old('unit_to_gram') }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
-                                        placeholder="例：250g/個">
+                                        placeholder="例：1000(g/本)">
                                 </div>
                             </div>
 

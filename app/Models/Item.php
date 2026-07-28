@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\ItemPurchaseUnit;
 use App\Enums\StorageLocation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,12 +20,14 @@ class Item extends Model
         'item_category_id',
         'proper_inventory',
         'unit',
-        'capacity',
+        'purchase_unit',
+        'unit_to_gram',
         'storage_location',
         'vendor_id',
     ];
 
     protected $casts = [
+        'purchase_unit' => ItemPurchaseUnit::class,
         'storage_location' => StorageLocation::class,
     ];
 

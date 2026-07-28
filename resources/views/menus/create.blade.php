@@ -14,29 +14,51 @@
             <form action="{{ route('menus.store') }}" method="POST">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                        <ul class="list-disc list-inside space-y-0.5">
+                            @foreach ($errors->all() as $message)
+                                <li>{{ $message }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">メニュー名</label>
-                        <input type="text" name="name"
+                        <input type="text" name="name" value="{{ old('name') }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" required
                             placeholder="例：ハンバーグ">
+                        @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
-                        <select name="dish_category_id"
+                        <select name="dish_category"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @foreach(App\Enums\DishCategory::cases() as $category)
+                                <option value="{{ $category->value }}" {{ old('dish_category') === $category->value ? 'selected' : '' }}>
+                                    {{ $category->label() }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('dish_category') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">提供人数(人)</label>
+                        <input type="number" name="servings" value="{{ old('servings') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50"
+                            required placeholder="何人分">
+                        @error('servings') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">総カロリー (kcal/人)</label>
-                        <input type="number" name="calories"
+                        <input type="number" name="calories" value="{{ old('calories') }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50"
                             placeholder="任意">
+                        @error('calories') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -166,7 +188,7 @@
                     }
                 });
 
-                // 2. 枠枠の追加
+                // 2. 枠の追加
                 addButton.addEventListener('click', function () {
                     const firstRow = container.querySelector('.item-row');
                     if (!firstRow) return;

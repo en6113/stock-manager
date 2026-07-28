@@ -8,26 +8,45 @@
             @csrf
             @method('PUT')
 
+            @if ($errors->any())
+                <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $message)
+                            <li>{{ $message }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">メニュー名</label>
                     <input type="text" name="name" value="{{ old('name', $menu->name) }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" required>
+                    @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
+                        <select name="dish_category" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                            @foreach(App\Enums\DishCategory::cases() as $category)
+                                <option value="{{ $category->value }}" {{ old('dish_category', $menu->dish_category?->value) === $category->value ? 'selected' : '' }}>
+                                    {{ $category->label() }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @error('dish_category') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">総カロリー (kcal)</label>
                     <input type="number" name="calories" value="{{ old('calories', $menu->calories) }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
+                    @error('calories') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
-                    <select name="dish_category"
+                    <label class="block text-sm font-medium text-gray-700">提供人数</label>
+                    <input type="number" name="servings" value="{{ old('servings', $menu->servings) }}"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
-                        <option value="1" {{ $menu->dish_category == 1 ? 'selected' : '' }}>主菜 (main)</option>
-                        <option value="2" {{ $menu->dish_category == 2 ? 'selected' : '' }}>副菜 (side)</option>
-                        <option value="3" {{ $menu->dish_category == 3 ? 'selected' : '' }}>汁物 (soup)</option>
-                        <option value="4" {{ $menu->dish_category == 4 ? 'selected' : '' }}>おやつ (snack)</option>
-                    </select>
+                    @error('servings') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 

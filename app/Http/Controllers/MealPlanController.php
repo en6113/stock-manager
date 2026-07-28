@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\DishCategory;
+use App\Models\Item;
 use App\Models\MealPlan;
 use App\Models\MealPlanMenuItem;
 use App\Models\Menu;
@@ -44,12 +44,11 @@ class MealPlanController extends Controller
 
     public function create()
     {
-        $categories = DishCategory::all();
-
-        $menusWithItems = Menu::with('items')->get();
+        $menus = Menu::with('items.allergens')->get();
+        $items = Item::orderBy('name')->get(); // メニューに無い食材を追加するための一覧
 
         // メニューに紐づく食材とその中間テーブルのデータをJavaScriptが扱いやすい配列の形で取得する
-        $menuIngredientsData = $menusWithItems->mapWithKeys(function ($menu) {
+        $menuIngredientsData = $menus->mapWithKeys(function ($menu) {
             $ingredients = $menu->items->map(function ($item) {
                 return [
                     'item_id' => $item->id,
@@ -61,16 +60,14 @@ class MealPlanController extends Controller
             return [$menu->id => $ingredients];
         });
 
-        $menus = Menu::with('dishCategory')->get();
-
-        return view('meal_plans.create', compact('categories','menus', 'menuIngredientsData'));
+        return view('meal_plans.create', compact('menus', 'menuIngredientsData', 'items'));
     }
 
     public function store(MealPlanRequest $request)
     {
         $mealPlan = \DB::transaction(function () use ($request) {
             $mealPlan = MealPlan::create($request->validated());
-            
+
             $syncData = $request->getFormattedMenuData(); // リクエストでデータを成型
             $mealPlan->syncMenusAndIngredients($syncData, (int) $request->input('servings', 50)); // モデルに中間テーブルへの保存ロジックあり
 
@@ -82,13 +79,14 @@ class MealPlanController extends Controller
 
     public function edit(MealPlan $mealPlan)
     {
-        $categories = DishCategory::all();
+        $categories = \App\Enums\DishCategory::cases();
         $menus = Menu::all();
+        $items = Item::orderBy('name')->get(); // メニューに無い食材を追加するための一覧
 
         // 1. 保存済の提供人数と食材リストを取得
         $currentServings = \DB::table('meal_plan_menu')
             ->where('meal_plan_id', $mealPlan->id)
-            ->value('servings') ?? 50; // データがなければデフォルト50
+            ->value('servings') ?? 50; // デフォルト50
 
         $adjustedItems = MealPlanMenuItem::with('item')
             ->whereIn('meal_plan_menu_id', function ($query) use ($mealPlan) {
@@ -96,8 +94,8 @@ class MealPlanController extends Controller
             })->get();
 
         // 2. ディッシュカテゴリごとのデータ構造を作る
-        $structuredData = $categories->map(function ($category) use ($mealPlan, $currentServings, $adjustedItems) {
-            $currentMenu = $mealPlan->menus->where('dish_category_id', $category->id)->first();
+        $structuredData = collect($categories)->map(function ($category) use ($mealPlan, $currentServings, $adjustedItems) {
+            $currentMenu = $mealPlan->menus->where('dish_category', $category)->first();
             $ingredientsForView = [];
 
             if ($currentMenu) {
@@ -162,7 +160,7 @@ class MealPlanController extends Controller
             return [$menu->id => $ingredients];
         });
 
-        return view('meal_plans.edit', compact('mealPlan', 'menus', 'currentServings', 'structuredData', 'menuIngredientsData'));
+        return view('meal_plans.edit', compact('mealPlan', 'menus', 'currentServings', 'structuredData', 'menuIngredientsData', 'items'));
     }
 
     public function update(MealPlanRequest $request, MealPlan $mealPlan)

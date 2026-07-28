@@ -42,10 +42,10 @@
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             <th class="px-6 py-3 w-60">食材名</th>
-                            <th class="px-6 py-3 w-40">適正在庫数(単位)</th>
+                            <th class="px-6 py-3 w-40">カテゴリー</th>
+                            <th class="px-6 py-3 w-40">適正在庫数(購入単位)</th>
                             <th class="px-6 py-3 w-40">規格容量</th>
                             <th class="px-6 py-3 w-40">保管場所</th>
-                            <th class="px-6 py-3 w-40">カテゴリー</th>
                             <th class="px-6 py-3 w-40">アレルギー物質</th>
                             <th class="px-6 py-3 text-right">操作</th>
                         </tr>
@@ -59,22 +59,22 @@
                                     {{ $item->name }}
                                 </td>
 
-                                <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->target_stock_qty ?? 0 }}<span class="text-xs">{{ $item->unit }}</span>
+                                <td class="px-6 py-4 text-xs text-gray-600">
+                                    {{ $item->itemCategory->name ?? '未指定' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->capacity ?? '-' }}
+                                    {{ $item->target_stock_qty ?? 0 }}<span class="text-xs">{{ $item->purchase_unit ?? 'g'}}</span>
+                                </td>
+
+                                <td class="px-6 py-4 text-gray-600">
+                                    {{ $item->unit_to_gram ?? '-' }}<span class="text-xs">g/{{ $item->purchase_unit ?? 'g' }}</span>
                                 </td>
 
                                 <td class="px-6 py-4">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $item->storage_location?->colorClass() }}">
                                         {{ $item->storage_location?->label() }}
                                     </span>
-                                </td>
-
-                                <td class="px-6 py-4 text-xs text-gray-600">
-                                    {{ $item->itemCategory->name ?? '未指定' }}
                                 </td>
 
                                 <td class="px-6 py-4">

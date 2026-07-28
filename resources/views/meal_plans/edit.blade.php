@@ -38,16 +38,16 @@
                 @endphp
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
-                    data-category-id="{{ $category->id }}">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
+                    data-category-id="{{ $category->value }}">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->label() }}</h2>
 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-                        <select name="menus[{{ $category->id }}][menu_id]"
+                        <select name="menus[{{ $category->value }}][menu_id]"
                             class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500"
-                            onchange="loadMenuIngredients(this, {{ $category->id }})">
+                            onchange="loadMenuIngredients(this, '{{ $category->value }}')">
                             <option value="">-- なし --</option>
-                            @foreach($menus->where('dish_category_id', $category->id) as $menu)
+                            @foreach($menus->where('dish_category', $category) as $menu)
                                 <option value="{{ $menu->id }}" {{ ($currentMenu && $currentMenu->id == $menu->id) ? 'selected' : '' }}>
                                     {{ $menu->name }}
                                 </option>
@@ -60,26 +60,40 @@
                         <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
                         <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
                             @foreach($ingredients as $index => $ing)
-                                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
                                     <div class="flex-1">
                                         <span class="font-medium text-gray-800">{{ $ing['name'] }}</span>
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         <input type="hidden"
-                                            name="menus[{{ $category->id }}][ingredients][{{ $index }}][item_id]"
+                                            name="menus[{{ $category->value }}][ingredients][{{ $index }}][item_id]"
                                             value="{{ $ing['item_id'] }}">
 
                                         <label class="text-xs text-gray-500">必要量:</label>
                                         <input type="number"
-                                            name="menus[{{ $category->id }}][ingredients][{{ $index }}][required_amount]"
+                                            name="menus[{{ $category->value }}][ingredients][{{ $index }}][required_amount]"
                                             data-per-person="{{ $ing['per_person_amount'] }}"
-                                            value="{{ old("menus.{$category->id}.ingredients.{$index}.required_amount", $ing['total_amount']) }}"
+                                            value="{{ old("menus.{$category->value}.ingredients.{$index}.required_amount", $ing['total_amount']) }}"
                                             class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
                                             min="0" step="0.1">
                                         <span class="text-gray-600 text-xs w-8">{{ $ing['unit'] }}</span>
+                                        <button type="button" class="text-red-500 hover:text-red-700 text-xs ml-2" onclick="this.closest('.ingredient-row').remove()">削除</button>
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+                        <div class="mt-3 flex items-center gap-2 add-item-row">
+                            <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                <option value="">-- 追加する食材を選択 --</option>
+                                @foreach($items as $item)
+                                    <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-unit="{{ $item->unit }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button"
+                                class="bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap"
+                                onclick="addIngredientRow(this, '{{ $category->value }}')">
+                                + 食材を追加
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -128,25 +142,75 @@
                 const totalAmount = (ing.required_amount * currentServings).toFixed(1);
 
                 const html = `
-                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
                     <div class="flex-1">
                         <span class="font-medium text-gray-8px">${ing.item_name}</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${ing.item_id}">
                         <label class="text-xs text-gray-500">必要量:</label>
-                        <input type="number" 
-                               name="menus[${categoryId}][ingredients][${index}][required_amount]" 
+                        <input type="number"
+                               name="menus[${categoryId}][ingredients][${index}][required_amount]"
                                data-per-person="${ing.required_amount}"
-                               value="${totalAmount}" 
-                               class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm" 
+                               value="${totalAmount}"
+                               class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm"
                                min="0" step="0.1">
                         <span class="text-gray-600 text-xs w-8">${ing.unit}</span>
+                        <button type="button" class="text-red-500 hover:text-red-700 text-xs ml-2" onclick="this.closest('.ingredient-row').remove()">削除</button>
                     </div>
                 </div>
             `;
                 ingredientList.insertAdjacentHTML('beforeend', html);
             });
+        }
+
+        // ★ 新機能：メニューに無い食材を追加する
+        function addIngredientRow(buttonEl, categoryId) {
+            const row = buttonEl.closest('.add-item-row');
+            const select = row.querySelector('.add-item-select');
+            const itemId = select.value;
+
+            if (!itemId) {
+                return;
+            }
+
+            const section = buttonEl.closest('.category-section');
+            const ingredientList = section.querySelector('.ingredient-list');
+
+            // すでに同じ食材が追加されていないかチェック
+            const alreadyAdded = Array.from(ingredientList.querySelectorAll('input[type="hidden"]'))
+                .some(input => input.value === itemId);
+            if (alreadyAdded) {
+                alert('すでに追加されている食材です。');
+                return;
+            }
+
+            const selectedOption = select.options[select.selectedIndex];
+            const itemName = selectedOption.getAttribute('data-name');
+            const unit = selectedOption.getAttribute('data-unit');
+            const index = `new_${Date.now()}`; // 既存のindexと衝突しないユニークなキー
+
+            const html = `
+                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
+                    <div class="flex-1">
+                        <span class="font-medium text-gray-8px">${itemName}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${itemId}">
+                        <label class="text-xs text-gray-500">必要量:</label>
+                        <input type="number"
+                               name="menus[${categoryId}][ingredients][${index}][required_amount]"
+                               data-per-person="0"
+                               value="0"
+                               class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm"
+                               min="0" step="0.1">
+                        <span class="text-gray-600 text-xs w-8">${unit}</span>
+                        <button type="button" class="text-red-500 hover:text-red-700 text-xs ml-2" onclick="this.closest('.ingredient-row').remove()">削除</button>
+                    </div>
+                </div>
+            `;
+            ingredientList.insertAdjacentHTML('beforeend', html);
+            select.value = '';
         }
 
         // 提供人数（servings）が手動で変更された時、表示されている必要量を一斉に自動再計算

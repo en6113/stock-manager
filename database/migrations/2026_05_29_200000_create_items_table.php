@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->foreignId('item_category_id')->constrained()->cascadeOnDelete();
             $table->integer('proper_inventory')->nullable();
-            $table->string('unit');
-            $table->string('capacity')->nullable();
+            $table->string('unit')->default('g');
+            $table->string('purchase_unit')->nullable();
+            $table->string('unit_to_gram')->nullable();
             $table->string('storage_location');
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

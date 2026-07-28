@@ -17,7 +17,6 @@ enum OrderStatus: string
         };
     }
 
-    // 対応する色のTailwindクラスを返すメソッド
     public function colorClass(): string
     {
         return match ($this) {

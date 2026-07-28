@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dish_category_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->string('dish_category');
             $table->integer('calorie')->nullable();
             $table->timestamps();
         });

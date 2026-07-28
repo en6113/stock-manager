@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\DishCategory;
+use App\Enums\DishCategory;
 use App\Models\Item;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Menu extends Model
@@ -16,16 +14,14 @@ class Menu extends Model
     use HasFactory;
 
     protected $fillable = [
-        'dish_category_id',
         'name',
+        'dish_category',
         'calorie',
     ];
 
-    // このメニューが属するディッシュカテゴリー（多対１）
-    public function dishCategory(): BelongsTo
-    {
-        return $this->belongsTo(DishCategory::class);
-    }
+    protected $casts = [
+        'dish_category' => DishCategory::class,
+    ];
 
     // このメニューに関連する食材（多対多）
     public function items() : BelongsToMany

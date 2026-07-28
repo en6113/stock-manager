@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\DishCategory;
 use App\Models\Item;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class MenuRequest extends FormRequest
 {
@@ -24,20 +27,23 @@ class MenuRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'dish_category_id' => 'required|integer',
+            'dish_category' => ['required', Rule::enum(DishCategory::class)],
+            'servings' => 'required|integer',
             'calories' => 'nullable|integer',
-            'item_name.*' => 'required|string',
-            'required_amounts.*' => 'required_with:item_name.*|nullable|numeric|min:0.1',
+            'item_ids.*' => 'required|string',
+            'required_amounts.*' => 'required|numeric|min:1',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'メニュー名を入力してください。',
-            'dish_category_id.required' => 'カテゴリーを選択してください。',
-            'item_id.required' => '食材名を入力してください。',
-            'required_amount.required' => '必要量を入力してください',
+            'name.required' => 'メニュー名を入力してください',
+            'dish_category.required' => 'カテゴリーを選択してください',
+            'dish_category.' . Enum::class => 'カテゴリーを選択肢から選択してください',
+            'servings.required' => '提供人数を入力してください',
+            'item_name.required' => '食材名を入力してください',
+            'required_amounts.required' => '必要量を入力してください',
         ];
     }
 
