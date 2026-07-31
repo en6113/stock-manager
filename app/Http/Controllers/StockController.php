@@ -24,6 +24,6 @@ class StockController extends Controller
     {
         $items = $this->stockService->getStockList();
 
-        return view('stocks.index',compact('items'));
+        return view('stocks.index', compact('items'));
     }
 }

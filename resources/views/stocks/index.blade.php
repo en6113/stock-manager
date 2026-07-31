@@ -51,15 +51,15 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-gray-500 text-right">
-                                    {{ number_format($item->required_qty ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
+                                    {{ number_format($item->required_qty ?? 0) }} <span class="text-xs">g</span>
                                 </td>
 
                                 <td class="px-4 py-3 text-blue-500 text-right">
-                                    {{ number_format($item->current_stock ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
+                                    {{ number_format($item->current_stock ?? 0) }} <span class="text-xs">g</span>
                                 </td>
 
                                 <td class="px-4 py-3 text-gray-500 text-right">
-                                    {{ number_format($item->pending_ordered_qty ?? 0) }} <span class="text-xs">{{ $item->unit }}</span>
+                                    {{ number_format($item->pending_ordered_qty ?? 0) }} <span class="text-xs">g</span>
                                 </td>
 
                                 <td class="px-4 py-3 text-center">

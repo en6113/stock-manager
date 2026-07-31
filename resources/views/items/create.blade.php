@@ -17,7 +17,7 @@
                         @csrf
                         <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">食材名</label>
+                                <label class="leading-loose text-sm font-medium">食材名<span class="text-red-500">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                     placeholder="例：マヨネーズ" required>
@@ -25,8 +25,9 @@
                             </div>
 
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">カテゴリー</label>
+                                <label class="leading-loose text-sm font-medium">カテゴリー<span class="text-red-500">*</span></label>
                                 <select name="item_category_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                    <option value="">-- 選択してください --</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
@@ -40,17 +41,17 @@
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">単位</label>
+                                    <label class="leading-loose text-sm font-medium">単位<span class="text-red-500">*</span></label>
                                     <select name="purchase_unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
-                                        @foreach(App\Enums\ItemPurchaseUnit::cases() as $purchaseUnit)
-                                            <option value="{{ $purchaseUnit->value }}">
-                                                {{ $purchaseUnit->label() }}
+                                        @foreach(App\Enums\ItemUnit::cases() as $unit)
+                                            <option value="{{ $unit->value }}">
+                                                {{ $unit->label() }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">規格容量(g/単位)</label>
+                                    <label class="leading-loose text-sm font-medium">1単位あたりのグラム数</label>
                                     <input type="integer" name="unit_to_gram" value="{{ old('unit_to_gram') }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
                                         placeholder="例：1000(g/本)">
@@ -59,8 +60,9 @@
 
                             <div class="flex flex-col">
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">保管場所</label>
+                                    <label class="leading-loose text-sm font-medium">保管場所<span class="text-red-500">*</span></label>
                                     <select name="storage_location" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                        <option value="">-- 選択してください --</option>
                                         @foreach(App\Enums\StorageLocation::cases() as $location)
                                             <option value="{{ $location->value }}">
                                                 {{ $location->label() }}
@@ -71,9 +73,10 @@
                             </div>
 
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">メイン仕入れ業者</label>
+                                <label class="leading-loose text-sm font-medium">メイン仕入れ業者<span class="text-red-500">*</span></label>
                                 <select name="vendor_id"
                                     class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
+                                    <option value="">-- 選択してください --</option>
                                     @foreach($vendors as $vendor)
                                         <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
                                     @endforeach

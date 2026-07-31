@@ -103,7 +103,7 @@ class OrderSeeder extends Seeder
             ],
         ];
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             Order::create($order);
         }
     }

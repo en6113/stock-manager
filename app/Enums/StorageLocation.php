@@ -11,7 +11,7 @@ enum StorageLocation: string
     // 画面表示用の日本語名を返すメソッド
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PANTRY => 'パントリー',
             self::REFRIGERATOR => '冷蔵庫',
             self::FREEZER => '冷凍庫',

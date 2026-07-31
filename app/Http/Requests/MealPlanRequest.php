@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MealPlanRequest extends FormRequest
@@ -17,7 +18,7 @@ class MealPlanRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -40,7 +41,7 @@ class MealPlanRequest extends FormRequest
 
             $formatted[] = [
                 'menu_id' => $menuData['menu_id'],
-                'ingredients' => $menuData['ingredients'] ?? [] // 調整後の食材の配列
+                'ingredients' => $menuData['ingredients'] ?? [], // 調整後の食材の配列
             ];
         }
 

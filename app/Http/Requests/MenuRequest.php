@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\DishCategory;
 use App\Models\Item;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -21,7 +22,7 @@ class MenuRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -30,8 +31,8 @@ class MenuRequest extends FormRequest
             'dish_category' => ['required', Rule::enum(DishCategory::class)],
             'servings' => 'required|integer',
             'calories' => 'nullable|integer',
-            'item_ids.*' => 'required|string',
-            'required_amounts.*' => 'required|numeric|min:1',
+            'item_names.*' => 'nullable|string|exists:items,name',
+            'required_amounts.*' => 'nullable|numeric|min:0.1',
         ];
     }
 
@@ -40,10 +41,9 @@ class MenuRequest extends FormRequest
         return [
             'name.required' => 'メニュー名を入力してください',
             'dish_category.required' => 'カテゴリーを選択してください',
-            'dish_category.' . Enum::class => 'カテゴリーを選択肢から選択してください',
+            'dish_category.'.Enum::class => 'カテゴリーを選択肢から選択してください',
             'servings.required' => '提供人数を入力してください',
-            'item_name.required' => '食材名を入力してください',
-            'required_amounts.required' => '必要量を入力してください',
+            'item_name.exists' => 'マスターに存在する食材名を入力してください',
         ];
     }
 
@@ -63,20 +63,21 @@ class MenuRequest extends FormRequest
         $items = Item::whereIn('name', $itemNames)->get()->keyBy('name');
 
         $requiredAmounts = $this->input('required_amounts', []);
+        $servings = $this->input('servings');
 
         $syncData = [];
 
         foreach ($this->input('item_ids', []) as $key => $itemName) {
             // 空白の入力枠は無視するロジック（エラー防止）
-            if (empty($itemName) || !$items->has($itemName)) {
+            if (empty($itemName) || ! $items->has($itemName)) {
                 continue;
             }
 
             $item = $items->get($itemName);
-            $amount = $requiredAmounts[$key] ?? 0;
 
             $syncData[$item->id] = [
-                'required_amount' => $amount,
+                'required_amount' => $requiredAmounts[$key] ?? 0,
+                'servings' => $servings,
             ];
         }
 

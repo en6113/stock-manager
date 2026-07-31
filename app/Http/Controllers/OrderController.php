@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Item;
-use App\Models\Vendor;
 use App\Http\Requests\OrderRequest;
+use App\Models\Item;
+use App\Models\Order;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -15,7 +15,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Order::with('item','vendor')
+        $orders = Order::with('item', 'vendor')
             ->statusSearch($request->status)
             ->vendorSearch($request->vendor_id)
             ->latest('ordered_date')
@@ -23,7 +23,7 @@ class OrderController extends Controller
 
         $vendors = Vendor::all();
 
-        return view('orders.index', compact('orders','vendors'));
+        return view('orders.index', compact('orders', 'vendors'));
     }
 
     /**

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Enums\DishCategory;
+use App\Http\Requests\MealPlanRequest;
 use App\Models\Item;
 use App\Models\MealPlan;
 use App\Models\MealPlanMenuItem;
 use App\Models\Menu;
-use App\Http\Requests\MealPlanRequest;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class MealPlanController extends Controller
 {
@@ -54,9 +54,13 @@ class MealPlanController extends Controller
                     'item_id' => $item->id,
                     'item_name' => $item->name,
                     'unit' => $item->unit,
-                    'required_amount' => $item->pivot->required_amount,
+                    'allergens' => $item->allergens->pluck('name')->implode('、'),
+                    'perServing' => $item->pivot->servings > 0
+                        ? $item->pivot->required_amount / $item->pivot->servings
+                        : 0,
                 ];
             });
+
             return [$menu->id => $ingredients];
         });
 
@@ -74,21 +78,23 @@ class MealPlanController extends Controller
             return $mealPlan;
         });
 
-    return redirect()->route('meal_plans.index')->with('success', '献立を登録しました！');
+        return redirect()->route('meal_plans.index')->with('success', '献立を登録しました！');
     }
 
     public function edit(MealPlan $mealPlan)
     {
-        $categories = \App\Enums\DishCategory::cases();
+        $categories = DishCategory::cases();
         $menus = Menu::all();
         $items = Item::orderBy('name')->get(); // メニューに無い食材を追加するための一覧
+
+        $mealPlan->load('menus.items.allergens');
 
         // 1. 保存済の提供人数と食材リストを取得
         $currentServings = \DB::table('meal_plan_menu')
             ->where('meal_plan_id', $mealPlan->id)
             ->value('servings') ?? 50; // デフォルト50
 
-        $adjustedItems = MealPlanMenuItem::with('item')
+        $adjustedItems = MealPlanMenuItem::with('item.allergens')
             ->whereIn('meal_plan_menu_id', function ($query) use ($mealPlan) {
                 $query->select('id')->from('meal_plan_menu')->where('meal_plan_id', $mealPlan->id);
             })->get();
@@ -114,12 +120,15 @@ class MealPlanController extends Controller
                         $masterItem = $currentMenu->items->where('id', $adjustedItem->item_id)->first();
 
                         // マスタに登録されている1人分の量を取得（万が一マスタから消えていた場合は0）
-                        $perPersonAmount = $masterItem ? $masterItem->pivot->required_amount : 0;
+                        $perPersonAmount = ($masterItem && $masterItem->pivot->servings > 0)
+                            ? $masterItem->pivot->required_amount / $masterItem->pivot->servings
+                            : 0;
 
                         $ingredientsForView[] = [
                             'item_id' => $adjustedItem->item_id,
                             'name' => $adjustedItem->item->name,
                             'unit' => $adjustedItem->item->unit,
+                            'allergens' => $adjustedItem->item->allergens->pluck('name')->implode('、'),
                             'per_person_amount' => $perPersonAmount, // 1人分
                             'total_amount' => $adjustedItem->adjust_amount, // 保存されている総重量
                         ];
@@ -130,12 +139,17 @@ class MealPlanController extends Controller
             // もしメニューはあるのに中間データがない場合はマスターから取得
             if ($currentMenu && empty($ingredientsForView)) {
                 foreach ($currentMenu->items as $item) {
+                    $perPersonAmount = $item->pivot->servings > 0
+                        ? $item->pivot->required_amount / $item->pivot->servings
+                        : 0;
+
                     $ingredientsForView[] = [
                         'item_id' => $item->id,
                         'name' => $item->name,
                         'unit' => $item->unit,
-                        'per_person_amount' => $item->pivot->required_amount,
-                        'total_amount' => $item->pivot->required_amount * $currentServings,
+                        'allergens' => $item->allergens->pluck('name')->implode('、'),
+                        'per_person_amount' => $perPersonAmount,
+                        'total_amount' => $perPersonAmount * $currentServings,
                     ];
                 }
             }
@@ -143,20 +157,24 @@ class MealPlanController extends Controller
             return [
                 'category' => $category,
                 'current_menu' => $currentMenu,
-                'ingredients' => $ingredientsForView
+                'ingredients' => $ingredientsForView,
             ];
         });
 
         // 3. JavaScript用のマスターデータ(新規メニュー切り替え用)
-        $menuIngredientsData = Menu::with('items')->get()->mapWithKeys(function ($menu) {
+        $menuIngredientsData = Menu::with('items.allergens')->get()->mapWithKeys(function ($menu) {
             $ingredients = $menu->items->map(function ($item) {
                 return [
                     'item_id' => $item->id,
                     'item_name' => $item->name,
                     'unit' => $item->unit,
-                    'required_amount' => $item->pivot->required_amount, // マスタの1人分
+                    'allergens' => $item->allergens->pluck('name')->implode('、'),
+                    'perServing' => $item->pivot->servings > 0 // 必要量の1人分
+                        ? $item->pivot->required_amount / $item->pivot->servings
+                        : 0,
                 ];
             });
+
             return [$menu->id => $ingredients];
         });
 

@@ -23,6 +23,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
                     <select name="item_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
+                        <option value="">-- 選択してください --</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
@@ -44,7 +45,7 @@
                             <th class="px-6 py-3 w-60">食材名</th>
                             <th class="px-6 py-3 w-40">カテゴリー</th>
                             <th class="px-6 py-3 w-40">適正在庫数(購入単位)</th>
-                            <th class="px-6 py-3 w-40">規格容量</th>
+                            <th class="px-6 py-3 w-40">1単位当たりのグラム数</th>
                             <th class="px-6 py-3 w-40">保管場所</th>
                             <th class="px-6 py-3 w-40">アレルギー物質</th>
                             <th class="px-6 py-3 text-right">操作</th>
@@ -64,11 +65,11 @@
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->target_stock_qty ?? 0 }}<span class="text-xs">{{ $item->purchase_unit ?? 'g'}}</span>
+                                    {{ $item->target_stock_qty ?? 0 }}<span class="text-xs">{{ $item->unit }}</span>
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->unit_to_gram ?? '-' }}<span class="text-xs">g/{{ $item->purchase_unit ?? 'g' }}</span>
+                                    {{ $item->gram_per_unit ?? '-' }}<span class="text-xs">g/{{ $item->unit }}</span>
                                 </td>
 
                                 <td class="px-6 py-4">

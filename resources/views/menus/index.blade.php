@@ -16,8 +16,14 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">カテゴリ検索</label>
-                        <input type="text" name="dish_category" value="{{ request('dish_category') }}"
-                            class="mt-1 block rounded border-gray-300 p-2 bg-white">
+                        <select name="dish_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
+                            <option value="">-- 選択してください --</option>
+                            @foreach(App\Enums\DishCategory::cases() as $category)
+                                <option value="{{ $category->value }}" {{ request('dish_category') === $category->value ? 'selected' : '' }}>
+                                    {{ $category->label() }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">検索</button>
                     <div>

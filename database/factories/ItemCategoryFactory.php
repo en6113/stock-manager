@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\ItemCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ItemCategory>
+ * @extends Factory<ItemCategory>
  */
 class ItemCategoryFactory extends Factory
 {
@@ -17,7 +18,7 @@ class ItemCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'カテゴリー' . fake()->unique()->numberBetween(1,20), 
+            'name' => 'カテゴリー'.fake()->unique()->numberBetween(1, 20),
         ];
     }
 }

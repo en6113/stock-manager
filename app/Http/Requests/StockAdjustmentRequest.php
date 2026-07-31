@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AdjustmentReason;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -20,7 +21,7 @@ class StockAdjustmentRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -37,7 +38,7 @@ class StockAdjustmentRequest extends FormRequest
         return [
             'actual_qty.required' => '実際の在庫数を入力してください',
             'actual_qty.numeric' => '実際の在庫数は数値で入力してください',
-            'reason.' . Enum::class => '調整理由を選択肢から選択してください',
+            'reason.'.Enum::class => '調整理由を選択肢から選択してください',
         ];
     }
 }

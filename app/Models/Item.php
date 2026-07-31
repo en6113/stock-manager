@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Enums\ItemPurchaseUnit;
+use App\Enums\ItemUnit;
 use App\Enums\StorageLocation;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
@@ -20,14 +20,13 @@ class Item extends Model
         'item_category_id',
         'proper_inventory',
         'unit',
-        'purchase_unit',
-        'unit_to_gram',
+        'gram_per_unit',
         'storage_location',
         'vendor_id',
     ];
 
     protected $casts = [
-        'purchase_unit' => ItemPurchaseUnit::class,
+        'unit' => ItemUnit::class,
         'storage_location' => StorageLocation::class,
     ];
 
@@ -52,7 +51,7 @@ class Item extends Model
      */
     public function allergens(): BelongsToMany
     {
-        return $this->belongsToMany(Allergen::class,'allergen_item');
+        return $this->belongsToMany(Allergen::class, 'allergen_item');
     }
 
     /**
@@ -60,7 +59,7 @@ class Item extends Model
      */
     public function menus(): BelongsToMany
     {
-        return $this->belongsToMany(Menu::class,'item_menu');
+        return $this->belongsToMany(Menu::class, 'item_menu');
     }
 
     /**
@@ -90,23 +89,23 @@ class Item extends Model
     /**
      * キーワード検索スコープ
      */
-    public function scopeKeywordSearch(Builder $query, ?string $keyword) :Builder
+    public function scopeKeywordSearch(Builder $query, ?string $keyword): Builder
     {
         if (blank($keyword)) {
             return $query;
         }
 
         return $query->where(function ($q) use ($keyword) {
-            $q->where('name', 'like', '%' . $keyword . '%');
+            $q->where('name', 'like', '%'.$keyword.'%');
         });
     }
 
     /**
      * カテゴリー検索スコープ
      */
-    public function scopeCategorySearch(Builder $query, ?int $category) :Builder
+    public function scopeCategorySearch(Builder $query, ?int $category): Builder
     {
-        if(blank($category)) {
+        if (blank($category)) {
             return $query;
         }
 
@@ -114,12 +113,20 @@ class Item extends Model
     }
 
     /**
+     * 指定した数量をグラムに換算する
+     */
+    public function toGram(float|int|null $amount): float
+    {
+        return round(($amount ?? 0) * $this->gram_per_unit, 1);
+    }
+
+    /**
      * スコープ：必要量（明日以降の献立メニューで使用する量）
      */
-    public function scopeWithRequiredQty($query) :Builder
+    public function scopeWithRequiredQty($query): Builder
     {
-        return $query->withSum(['mealPlanMenuItems as required_qty' => function($q) {
-            $q->whereHas('mealPlanMenu.mealPlan', function($subQ) {
+        return $query->withSum(['mealPlanMenuItems as required_qty' => function ($q) {
+            $q->whereHas('mealPlanMenu.mealPlan', function ($subQ) {
                 $subQ->where('date', '>', now()->toDateString());
             });
         }], 'adjust_amount');
@@ -131,14 +138,14 @@ class Item extends Model
     public function scopeWithOrderedQty($query): Builder
     {
         return $query->withSum(['orders as pending_ordered_qty' => function ($q) {
-                $q->whereNull('received_date')->whereNotNull('ordered_date');
+            $q->whereNull('received_date')->whereNotNull('ordered_date');
         }], 'ordered_qty');
     }
 
     /**
      * スコープ：納品済の数量（発注量のうち、ステータスが2:納品済のもの）
      */
-    public function scopeWithReceivedQty($query) :Builder
+    public function scopeWithReceivedQty($query): Builder
     {
         return $query->withSum(['orders as received_qty' => function ($q) {
             $q->whereNotNull('received_date');
@@ -148,12 +155,12 @@ class Item extends Model
     /**
      * スコープ：調理済の数量（今日までの献立メニューで使用した量）
      */
-    public function scopeWithCookedQty($query) :Builder
+    public function scopeWithCookedQty($query): Builder
     {
         return $query->withSum(['mealPlanMenuItems as cooked_qty' => function ($q) {
-                $q->whereHas('mealPlanMenu.mealPlan', function ($subQ) {
-                    $subQ->where('date', '<', now()->toDateString());
-                });
+            $q->whereHas('mealPlanMenu.mealPlan', function ($subQ) {
+                $subQ->where('date', '<', now()->toDateString());
+            });
         }], 'adjust_amount');
     }
 

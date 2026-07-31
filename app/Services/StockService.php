@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 class StockService
 {
     /**
-    * 在庫管理一覧用のデータを取得
-    * * @return Collection
-    */
+     * 在庫管理一覧用のデータを取得
+     */
     public function getStockList(): Collection
     {
         // モデルに定義したスコープをチェーンしてデータを取得
