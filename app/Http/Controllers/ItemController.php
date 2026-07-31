@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ItemRequest;
 use App\Http\Requests\IndexItemRequest;
+use App\Http\Requests\ItemRequest;
 use App\Models\Allergen;
 use App\Models\Item;
 use App\Models\ItemCategory;
@@ -35,7 +35,7 @@ class ItemController extends Controller
         $vendors = Vendor::all();
         $allergens = Allergen::all();
 
-        return view('items.create', compact('categories','vendors', 'allergens'));
+        return view('items.create', compact('categories', 'vendors', 'allergens'));
     }
 
     /**

@@ -9,7 +9,7 @@ class IsLowStockTest extends TestCase
     /**
      * @dataProvider lowstockDataProvider
      */
-    public function test_isLowStockCalculation($calculatedStock, $ordered, $reserved, $targetStock, $expectedResult)
+    public function test_is_low_stock_calculation($calculatedStock, $ordered, $reserved, $targetStock, $expectedResult)
     {
         // arrange
         $item = Item::factory()->make([
@@ -21,7 +21,7 @@ class IsLowStockTest extends TestCase
         $isLowStock = ($item->calculated_stock_qty + $ordered) <= ($reserved + ($item->target_stock_qty ?? 0));
 
         // assert
-        $this->assertEquals($expectedResult, $isLowStock, "期待した判定結果と一致しません");
+        $this->assertEquals($expectedResult, $isLowStock, '期待した判定結果と一致しません');
     }
 
     /**

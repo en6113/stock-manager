@@ -11,7 +11,8 @@
             </form>
         </div>
 
-        <form action="{{ route('meal_plans.update', $mealPlan->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('meal_plans.update', $mealPlan->id) }}" method="POST" class="space-y-6"
+            data-menu-ingredients="{{ json_encode($menuIngredientsData ?? []) }}">
             @csrf
             @method('PUT')
 
@@ -38,16 +39,15 @@
                 @endphp
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
-                    data-category-id="{{ $category->id }}">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
+                    data-category-id="{{ $category->value }}">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->label() }}</h2>
 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-                        <select name="menus[{{ $category->id }}][menu_id]"
-                            class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500"
-                            onchange="loadMenuIngredients(this, {{ $category->id }})">
+                        <select name="menus[{{ $category->value }}][menu_id]"
+                            class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500">
                             <option value="">-- なし --</option>
-                            @foreach($menus->where('dish_category_id', $category->id) as $menu)
+                            @foreach($menus->where('dish_category', $category) as $menu)
                                 <option value="{{ $menu->id }}" {{ ($currentMenu && $currentMenu->id == $menu->id) ? 'selected' : '' }}>
                                     {{ $menu->name }}
                                 </option>
@@ -60,26 +60,45 @@
                         <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
                         <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
                             @foreach($ingredients as $index => $ing)
-                                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
+                                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm ingredient-row">
                                     <div class="flex-1">
                                         <span class="font-medium text-gray-800">{{ $ing['name'] }}</span>
+                                        @if($ing['allergens'])
+                                            <span class="text-xs text-red-500 ml-2">（アレルギー: {{ $ing['allergens'] }}）</span>
+                                        @endif
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         <input type="hidden"
-                                            name="menus[{{ $category->id }}][ingredients][{{ $index }}][item_id]"
+                                            name="menus[{{ $category->value }}][ingredients][{{ $index }}][item_id]"
                                             value="{{ $ing['item_id'] }}">
 
                                         <label class="text-xs text-gray-500">必要量:</label>
                                         <input type="number"
-                                            name="menus[{{ $category->id }}][ingredients][{{ $index }}][required_amount]"
+                                            name="menus[{{ $category->value }}][ingredients][{{ $index }}][required_amount]"
                                             data-per-person="{{ $ing['per_person_amount'] }}"
-                                            value="{{ old("menus.{$category->id}.ingredients.{$index}.required_amount", $ing['total_amount']) }}"
+                                            value="{{ old("menus.{$category->value}.ingredients.{$index}.required_amount", $ing['total_amount']) }}"
                                             class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
                                             min="0" step="0.1">
-                                        <span class="text-gray-600 text-xs w-8">{{ $ing['unit'] }}</span>
+                                        <span class="text-gray-600 text-xs w-8">g</span>
+                                        <span class="text-xs text-gray-500 ml-2">1人分:</span>
+                                        <span class="per-serving-display text-xs font-semibold text-blue-600">{{ round($ing['per_person_amount'], 1) }}</span>
+                                        <span class="text-gray-600 text-xs w-4">g</span>
+                                        <button type="button" class="remove-ingredient-btn text-red-500 hover:text-red-700 text-xs ml-2">削除</button>
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+                        <div class="mt-3 flex items-center gap-2 add-item-row">
+                            <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                <option value="">-- 追加する食材を選択 --</option>
+                                @foreach($items as $item)
+                                    <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button"
+                                class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                                + 食材を追加
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -94,75 +113,5 @@
         </form>
     </div>
 
-    <script>
-        const menuIngredientsData = @json($menuIngredientsData ?? []);
-
-        // メニュー変更時：マスタデータ(1人分) × 提供人数 で計算して表示
-        function loadMenuIngredients(selectElement, categoryId) {
-            const menuId = selectElement.value;
-            const section = selectElement.closest('.category-section');
-            const adjustmentArea = section.querySelector('.ingredient-adjustment-area');
-            const ingredientList = section.querySelector('.ingredient-list');
-
-            if (!menuId) {
-                adjustmentArea.classList.add('hidden');
-                ingredientList.innerHTML = '';
-                return;
-            }
-
-            adjustmentArea.classList.remove('hidden');
-            ingredientList.innerHTML = '';
-
-            const ingredients = menuIngredientsData[menuId] || [];
-
-            if (ingredients.length === 0) {
-                ingredientList.innerHTML = '<p class="text-xs text-gray-500">登録されている食材はありません。</p>';
-                return;
-            }
-
-            // 現在入力されている提供人数を取得
-            const servingsInput = document.getElementById('servings-input');
-            const currentServings = servingsInput ? parseInt(servingsInput.value) || 50 : 50;
-
-            ingredients.forEach((ing, index) => {
-                const totalAmount = (ing.required_amount * currentServings).toFixed(1);
-
-                const html = `
-                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
-                    <div class="flex-1">
-                        <span class="font-medium text-gray-8px">${ing.item_name}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${ing.item_id}">
-                        <label class="text-xs text-gray-500">必要量:</label>
-                        <input type="number" 
-                               name="menus[${categoryId}][ingredients][${index}][required_amount]" 
-                               data-per-person="${ing.required_amount}"
-                               value="${totalAmount}" 
-                               class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm" 
-                               min="0" step="0.1">
-                        <span class="text-gray-600 text-xs w-8">${ing.unit}</span>
-                    </div>
-                </div>
-            `;
-                ingredientList.insertAdjacentHTML('beforeend', html);
-            });
-        }
-
-        // 提供人数（servings）が手動で変更された時、表示されている必要量を一斉に自動再計算
-        document.addEventListener('DOMContentLoaded', function () {
-            const servingsInput = document.getElementById('servings-input');
-
-            if (servingsInput) {
-                servingsInput.addEventListener('input', function () {
-                    const currentServings = parseInt(this.value) || 0;
-
-                    document.querySelectorAll('.ingredient-amount-input').forEach(input => {
-                        const perPersonAmount = parseFloat(input.getAttribute('data-per-person')) || 0;
-                        input.value = (perPersonAmount * currentServings).toFixed(1);
-                    });
-                });
-            }
-        });
-    </script>
+    @vite(['resources/js/pages/meal-plans/index.js'])
 </x-app-layout>

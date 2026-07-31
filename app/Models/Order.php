@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
-use App\Models\Item;
-use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
@@ -34,7 +32,7 @@ class Order extends Model
     /**
      * この在庫管理に属する商品を取得
      */
-    public function item(): BelongsTo
+    public function item(): belongsTo
     {
         return $this->belongsTo(Item::class);
     }
@@ -42,7 +40,7 @@ class Order extends Model
     /**
      * この在庫管理に属する発注業者を取得
      */
-    public function vendor(): BelongsTo
+    public function vendor(): belongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
@@ -78,7 +76,7 @@ class Order extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            get: fn () => match(true) {
+            get: fn () => match (true) {
                 filled($this->received_date) => OrderStatus::Received,
                 filled($this->ordered_date) => OrderStatus::Ordered,
                 default => OrderStatus::Pending,

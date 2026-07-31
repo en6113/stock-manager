@@ -10,23 +10,23 @@
                             <p class="text-sm text-gray-500 font-normal leading-relaxed">「{{ $item->name }}」の基本情報を変更します。</p>
                         </div>
                     </div>
-                    
+
                     <form action="{{ route('items.update', $item->id) }}" method="POST" class="divide-y divide-gray-200">
                         @csrf
                         @method('PUT')
-                        
+
                         <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">食材名</label>
+                                <label class="leading-loose text-sm font-medium">食材名<span class="text-red-500">*</span></label>
                                 <input type="text" name="name" value="{{ old('name', $item->name) }}" class="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" required>
                                 @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">種類</label>
+                                <label class="leading-loose text-sm font-medium">カテゴリー<span class="text-red-500">*</span></label>
                                 <select name="item_category_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" 
+                                        <option value="{{ $category->id }}"
                                             {{ old('item_category_id', $item->item_category_id) == $category->id ? 'selected' : '' }}>
                                             {{ $category->name }}
                                         </option>
@@ -37,29 +37,29 @@
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
                                     <label class="leading-loose text-sm font-medium">適正在庫数（下限）</label>
-                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', $item->target_stock_qty) }}"
+                                    <input type="number" name="target_stock_qty" value="{{ old('target_stock_qty', $item->proper_inventory) }}"
                                         class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" min="0" required>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">単位</label>
-                                    <select name="unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
-                                        required>
-                                        <option value="g" {{ $item->unit == 'g' ? 'selected' : '' }}>g</option>
-                                        <option value="ml" {{ $item->unit == 'ml' ? 'selected' : '' }}>ml</option>
-                                        <option value="個" {{ $item->unit == '個' ? 'selected' : '' }}>個</option>
-                                        <option value="パック" {{ $item->unit == 'パック' ? 'selected' : '' }}>パック</option>
+                                    <label class="leading-loose text-sm font-medium">単位<span class="text-red-500">*</span></label>
+                                    <select name="purchase_unit" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" required>
+                                        @foreach(App\Enums\ItemUnit::cases() as $unit)
+                                            <option value="{{ $unit->value }}" {{ ($item->unit?->value === $unit->value) ? 'selected' : '' }}>
+                                                {{ $unit->label() }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">規格容量（単位の補足）</label>
-                                    <input type="text" name="capacity" value="{{ old('capacity', $item->capacity) }}"
-                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" placeholder="例：1kg/本">
+                                    <label class="leading-loose text-sm font-medium">1単位あたりのグラム数</label>
+                                    <input type="text" name="capacity" value="{{ old('unit_to_gram', $item->unit_to_gram) }}"
+                                        class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600" placeholder="例：1000(g/本)">
                                 </div>
                             </div>
 
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex flex-col flex-1">
-                                    <label class="leading-loose text-sm font-medium">保管場所</label>
+                                    <label class="leading-loose text-sm font-medium">保管場所<span class="text-red-500">*</span></label>
                                     <select name="storage_location" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
                                         @foreach(App\Enums\StorageLocation::cases() as $location)
                                                 <option value="{{ $location->value }}" {{ ($item->storage_location?->value === $location->value) ? 'selected' : '' }}>
@@ -71,7 +71,7 @@
                             </div>
 
                             <div class="flex flex-col">
-                                <label class="leading-loose text-sm font-medium">メイン仕入れ業者</label>
+                                <label class="leading-loose text-sm font-medium">メイン仕入れ業者<span class="text-red-500">*</span></label>
                                 <select name="vendor_id" class="px-4 py-2 border w-full sm:text-sm border-gray-300 rounded-md text-gray-600">
                                     @foreach($vendors as $vendor)
                                         <option value="{{ $vendor->id }}" {{ $item->vendor_id == $vendor->id ? 'selected' : '' }}>{{ $vendor->name }}</option>

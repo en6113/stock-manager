@@ -15,10 +15,13 @@
                         <input type="text" name="keyword" value="{{ request('keyword') }}" class="mt-1 block rounded border-gray-300 p-2 bg-white" placeholder="キーワード">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
+                        <label class="block text-sm font-medium text-gray-700">カテゴリ検索</label>
                         <select name="dish_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            <option value="">-- 選択してください --</option>
+                            @foreach(App\Enums\DishCategory::cases() as $category)
+                                <option value="{{ $category->value }}" {{ request('dish_category') === $category->value ? 'selected' : '' }}>
+                                    {{ $category->label() }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -53,8 +56,10 @@
                                         {{ $menu->name }}
                                     </td>
 
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $menu->dishCategory->name }}
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $menu->dish_category?->colorClass() }}">
+                                        {{ $menu->dish_category?->label() }}
+                                        </span>
                                     </td>
 
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

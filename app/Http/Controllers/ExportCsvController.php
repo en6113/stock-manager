@@ -12,6 +12,7 @@ class ExportCsvController extends Controller
     {
         return view('reports.index');
     }
+
     /**
      * CSVダウンロード処理
      */
@@ -37,7 +38,7 @@ class ExportCsvController extends Controller
         // 「日付」⇒「カテゴリーコード」の順にグルーピングして集計
         $groupedData = $menuItems->groupBy(function ($menuItem) {
             return $menuItem->mealPlanMenu->mealPlan->date;
-        })->map(function ($dateItem) use($categoryCodes) {
+        })->map(function ($dateItem) use ($categoryCodes) {
             $groupedItem = $dateItem->groupBy('item.itemCategory.code');
 
             $row = [];
@@ -46,6 +47,7 @@ class ExportCsvController extends Controller
                     ? $groupedItem->get($code)->sum('adjust_amount')
                     : 0;
             }
+
             return $row;
         });
 
@@ -67,7 +69,7 @@ class ExportCsvController extends Controller
         // CSVの出力＆詳細設定
         return response()->streamDownload(function () use ($csvData, $categoryNames) {
             $handle = fopen('php://output', 'w');
-            fwrite($handle,"\xEF\xBB\xBF");
+            fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, array_merge(['日付'], $categoryNames));
 

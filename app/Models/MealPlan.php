@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Menu;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,13 +16,14 @@ class MealPlan extends Model
     ];
 
     // この献立に属するメニューを取得
-    public function menus() : BelongsToMany
+    public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'meal_plan_menu');
     }
 
     /**
      * カレンダー表示に必要な日付データを一斉に計算する
+     *
      * * @param string|null $monthParam (例: "2026-06")
      * @return array
      */
@@ -33,7 +33,7 @@ class MealPlan extends Model
         $monthParam = $monthParam ?? now()->format('Y-m');
 
         try {
-            $currentMonth = Carbon::parse($monthParam . '-01');
+            $currentMonth = Carbon::parse($monthParam.'-01');
         } catch (\Exception $e) {
             $currentMonth = now()->startOfMonth();
         }
@@ -50,7 +50,7 @@ class MealPlan extends Model
         $weekIndex = 0;
 
         while ($currentDay->lte($endOfCalendar)) {
-            $dayData = new \stdClass();
+            $dayData = new \stdClass;
             $dayData->carbon = $currentDay->copy();
             $dayData->isCurrentMonth = ($dayData->carbon->format('Y-m') === $currentMonth->format('Y-m'));
             $dayData->isToday = $dayData->carbon->isToday();

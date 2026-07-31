@@ -11,13 +11,12 @@ enum OrderStatus: string
     public function label(): string
     {
         return match ($this) {
-        self::Pending => '未発注',
-        self::Ordered => '発注済',
-        self::Received => '納品済',
+            self::Pending => '未発注',
+            self::Ordered => '発注済',
+            self::Received => '納品済',
         };
     }
 
-    // 対応する色のTailwindクラスを返すメソッド
     public function colorClass(): string
     {
         return match ($this) {

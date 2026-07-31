@@ -14,29 +14,52 @@
             <form action="{{ route('menus.store') }}" method="POST">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                        <ul class="list-disc list-inside space-y-0.5">
+                            @foreach ($errors->all() as $message)
+                                <li>{{ $message }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">メニュー名</label>
-                        <input type="text" name="name"
+                        <label class="block text-sm font-medium text-gray-700">メニュー名<span class="text-red-500">*</span></label>
+                        <input type="text" name="name" value="{{ old('name') }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" required
                             placeholder="例：ハンバーグ">
+                        @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
-                        <select name="dish_category_id"
+                        <label class="block text-sm font-medium text-gray-700">カテゴリ<span class="text-red-500">*</span></label>
+                        <select name="dish_category"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            <option value="">-- 選択してください --</option>
+                            @foreach(App\Enums\DishCategory::cases() as $category)
+                                <option value="{{ $category->value }}" {{ old('dish_category') === $category->value ? 'selected' : '' }}>
+                                    {{ $category->label() }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('dish_category') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">総カロリー (kcal/人)</label>
-                        <input type="number" name="calories"
+                        <input type="number" name="calories" value="{{ old('calories') }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50"
                             placeholder="任意">
+                        @error('calories') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">提供人数(人)<span class="text-red-500">*</span></label>
+                        <input type="number" id="servings-input" name="servings" value="{{ old('servings') }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50" required placeholder="何人分">
+                        @error('servings') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -57,12 +80,31 @@
                                         placeholder="キーワードを入力して選択">
                                 </div>
 
-                                <div class="w-48"> <label class="block text-xs font-medium text-gray-600 mb-1">必要量</label>
+                                <div class="w-40">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">数量（g換算自動計算用）</label>
                                     <div class="flex items-center gap-2">
-                                        <input type="number" name="required_amounts[]"
-                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
-                                            step="0.1">
+                                        <input type="number"
+                                            class="quantity-input block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
+                                            step="1">
                                         <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]"></span>
+                                    </div>
+                                </div>
+
+                                <div class="w-32">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">必要量(g)</label>
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" name="required_amounts[]"
+                                            class="required-amount-input block w-20 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
+                                            step="0.1">
+                                        <span class="text-sm text-gray-600">g</span>
+                                    </div>
+                                </div>
+
+                                <div class="w-28">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">1人分</label>
+                                    <div class="flex items-center gap-1">
+                                        <span class="per-serving-display text-sm font-semibold text-blue-600">-</span>
+                                        <span class="text-sm text-gray-600">g</span>
                                     </div>
                                 </div>
 
@@ -76,7 +118,7 @@
 
                     <datalist id="ingredient-list">
                         @foreach($registered_items as $item)
-                            <option value="{{ $item->name }}" data-id="{{ $item->id }}" data-unit="{{ $item->unit }}">
+                            <option value="{{ $item->name }}" data-id="{{ $item->id }}" data-unit="{{ $item->unit }}" data-gram-per-unit="{{ $item->gram_per_unit }}">
                                 ID: {{ $item->id }} </option>
                         @endforeach
                     </datalist>
@@ -91,7 +133,7 @@
                 {{-- ==================== 使用する調味料セクション ==================== --}}
                 <div class="mb-6 bg-white p-4 border border-gray-100 rounded-lg shadow-sm">
                     <h2 class="text-lg font-semibold mb-3 text-gray-700 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>使用する調味料 (カテゴリ15〜19)
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>使用する調味料 (カテゴリ13〜19)
                     </h2>
                     <div id="seasoning-container" class="space-y-3">
                         @for ($i = 0; $i < 3; $i++)
@@ -103,12 +145,30 @@
                                         placeholder="キーワードを入力して選択">
                                 </div>
 
-                                <div class="w-48"> <label class="block text-xs font-medium text-gray-600 mb-1">必要量</label>
+                                <div class="w-40"> <label class="block text-xs font-medium text-gray-600 mb-1">数量（g換算自動計算用）</label>
                                     <div class="flex items-center gap-2">
-                                        <input type="number" name="required_amounts[]"
-                                            class="block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
+                                        <input type="number"
+                                            class="quantity-input block w-24 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
                                             step="0.1">
                                         <span class="unit-display text-sm font-medium text-gray-600 min-w-[24px]"></span>
+                                    </div>
+                                </div>
+
+                                <div class="w-32">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">必要量(g)</label>
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" name="required_amounts[]"
+                                            class="required-amount-input block w-20 rounded border-gray-300 p-1.5 bg-white shadow-sm" min="0"
+                                            step="0.1">
+                                        <span class="text-sm text-gray-600">g</span>
+                                    </div>
+                                </div>
+
+                                <div class="w-28">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">1人分</label>
+                                    <div class="flex items-center gap-1">
+                                        <span class="per-serving-display text-sm font-semibold text-blue-600">-</span>
+                                        <span class="text-sm text-gray-600">g</span>
                                     </div>
                                 </div>
 
@@ -122,7 +182,7 @@
 
                     <datalist id="seasoning-list">
                         @foreach($seasoning_items as $item)
-                            <option value="{{ $item->name }}" data-id="{{ $item->id }}" data-unit="{{ $item->unit }}">
+                            <option value="{{ $item->name }}" data-id="{{ $item->id }}" data-unit="{{ $item->unit }}" data-gram-per-unit="{{ $item->gram_per_unit }}">
                                 ID: {{ $item->id }} </option>
                         @endforeach
                     </datalist>
@@ -142,81 +202,6 @@
             </form>
         </div>
 
-        <script>
-            // 食材用・調味料用 共通の枠制御ロジックを設定する関数
-            function setupDynamicContainer(containerId, buttonId, listId) {
-                const container = document.getElementById(containerId);
-                const addButton = document.getElementById(buttonId);
-
-                if (!container || !addButton) return;
-
-                // 1. 検索連動による単位の自動表示
-                container.addEventListener('input', function (e) {
-                    if (e.target.name === 'item_ids[]') {
-                        const input = e.target;
-                        const selectedValue = input.value;
-                        const option = document.querySelector(`#${listId} option[value="${selectedValue}"]`);
-                        const unitSpan = input.closest('.item-row').querySelector('.unit-display');
-
-                        if (option) {
-                            unitSpan.textContent = option.dataset.unit;
-                        } else {
-                            unitSpan.textContent = '';
-                        }
-                    }
-                });
-
-                // 2. 枠枠の追加
-                addButton.addEventListener('click', function () {
-                    const firstRow = container.querySelector('.item-row');
-                    if (!firstRow) return;
-
-                    const newRow = firstRow.cloneNode(true);
-
-                    // 入力値と単位表示をクリア
-                    newRow.querySelectorAll('input').forEach(input => input.value = '');
-                    newRow.querySelector('.unit-display').textContent = '';
-
-                    container.appendChild(newRow);
-                    toggleDeleteButtons(container);
-                });
-
-                // 3. 枠の削除
-                container.addEventListener('click', function (e) {
-                    if (e.target.classList.contains('remove-btn')) {
-                        // 最後の1行の場合は削除させない
-                        if (container.querySelectorAll('.item-row').length > 1) {
-                            e.target.closest('.item-row').remove();
-                            toggleDeleteButtons(container);
-                        }
-                    }
-                });
-
-                // 初期状態の削除ボタンチェック
-                toggleDeleteButtons(container);
-            }
-
-            // 削除ボタンの表示・非表示制御関数
-            function toggleDeleteButtons(container) {
-                const rows = container.querySelectorAll('.item-row');
-                rows.forEach((row) => {
-                    const btn = row.querySelector('.remove-btn');
-                    if (rows.length > 1) {
-                        btn.classList.remove('hidden');
-                    } else {
-                        btn.classList.add('hidden');
-                    }
-                });
-            }
-
-            // ★ 画面読み込み時に「食材」と「調味料」それぞれの設定を起動する
-            document.addEventListener('DOMContentLoaded', function () {
-                // 食材枠の設定（コンテナID, ボタンID, データリストID）
-                setupDynamicContainer('ingredient-container', 'add-ingredient-btn', 'ingredient-list');
-
-                // 調味料枠の設定（コンテナID, ボタンID, データリストID）
-                setupDynamicContainer('seasoning-container', 'add-seasoning-btn', 'seasoning-list');
-            });
-        </script>
+        @vite(['resources/js/pages/menus/create.js'])
     </div>
 </x-app-layout>

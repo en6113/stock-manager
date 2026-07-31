@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ItemUnit;
 use App\Enums\StorageLocation;
 use App\Models\Allergen;
 use App\Models\Item;
@@ -20,46 +21,48 @@ class ItemSeeder extends Seeder
             [
                 'name' => '豚肉（こま切れ）',
                 'item_category_id' => 2,
-                'unit' => 'g',
+                'unit' => ItemUnit::Gram,
+                'gram_per_unit' => 1,
                 'storage_location' => StorageLocation::REFRIGERATOR,
                 'vendor_id' => 3,
-                'menu_id' => [1, 3],
+                'menu_id' => 1,
                 'required_amount' => 60,
             ],
             [
                 'name' => '玉ねぎ',
                 'item_category_id' => 6,
-                'unit' => 'g',
-                'capacity' => '250g/個',
+                'unit' => ItemUnit::Piece,
+                'gram_per_unit' => 250,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => [1, 3, 5],
+                'menu_id' => 1,
                 'required_amount' => 60,
             ],
             [
                 'name' => 'にんじん',
                 'item_category_id' => 5,
-                'unit' => 'g',
-                'capacity' => '180g/個',
+                'unit' => ItemUnit::Piece,
+                'gram_per_unit' => 180,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => [1, 3],
+                'menu_id' => 1,
                 'required_amount' => 25,
             ],
             [
                 'name' => 'じゃがいも',
                 'item_category_id' => 8,
-                'unit' => 'g',
-                'capacity' => '150g/個',
+                'unit' => ItemUnit::Piece,
+                'gram_per_unit' => 150,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
-                'menu_id' => [1, 3],
+                'menu_id' => 1,
                 'required_amount' => 25,
             ],
             [
                 'name' => 'カレールウ',
                 'item_category_id' => 19,
-                'unit' => '箱',
+                'unit' => ItemUnit::Pack,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 1,
                 'menu_id' => 1,
@@ -68,38 +71,38 @@ class ItemSeeder extends Seeder
             [
                 'name' => 'サラダ油',
                 'item_category_id' => 16,
-                'unit' => 'g',
-                'capacity' => '1000g/本',
+                'unit' => ItemUnit::Bottle,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 1,
-                'menu_id' => [1, 3],
+                'menu_id' => 1,
                 'required_amount' => 1,
             ],
             [
                 'name' => 'キャベツ',
                 'item_category_id' => 6,
-                'unit' => 'g',
-                'capacity' => '600g/玉',
+                'unit' => ItemUnit::Head,
+                'gram_per_unit' => 600,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 2,
                 'menu_id' => 2,
                 'required_amount' => 70,
             ],
             [
-                'name' => 'ツナ缶',
+                'name' => 'ツナ',
                 'item_category_id' => 1,
-                'unit' => 'g',
-                'capacity' => '140g/缶',
+                'unit' => ItemUnit::Pack,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 1,
                 'menu_id' => 2,
                 'required_amount' => 11,
             ],
             [
-                'name' => 'コーン缶',
+                'name' => 'コーン',
                 'item_category_id' => 5,
-                'unit' => 'g',
-                'capacity' => '300g/缶',
+                'unit' => ItemUnit::Pack,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::PANTRY,
                 'vendor_id' => 1,
                 'menu_id' => 2,
@@ -108,18 +111,18 @@ class ItemSeeder extends Seeder
             [
                 'name' => 'ポン酢',
                 'item_category_id' => 19,
-                'unit' => 'ml',
-                'capacity' => '500ml/本',
+                'unit' => ItemUnit::Bottle,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::REFRIGERATOR,
                 'vendor_id' => 1,
-                'menu_id' => [2, 4],
+                'menu_id' => 2,
                 'required_amount' => 2,
             ],
             [
                 'name' => 'マヨネーズ',
                 'item_category_id' => 16,
-                'unit' => 'g',
-                'capacity' => '500g/本',
+                'unit' => ItemUnit::Bottle,
+                'gram_per_unit' => 1000,
                 'storage_location' => StorageLocation::REFRIGERATOR,
                 'vendor_id' => 1,
                 'allergens' => ['卵', '乳'],
@@ -134,14 +137,14 @@ class ItemSeeder extends Seeder
                 'item_category_id' => $data['item_category_id'],
                 'proper_inventory' => $data['proper_inventory'] ?? null,
                 'unit' => $data['unit'],
-                'capacity' => $data['capacity'] ?? null,
+                'gram_per_unit' => $data['gram_per_unit'] ?? null,
                 'storage_location' => $data['storage_location'],
                 'vendor_id' => $data['vendor_id'],
             ]);
 
             // アレルゲン物質がある場合は、中間テーブルに保存
             $allergens = $data['allergens'] ?? [];
-            $allergenIds = []; //毎回初期化する
+            $allergenIds = []; // 毎回初期化する
 
             foreach ($allergens as $allergenName) {
                 if (isset($allergenMap[$allergenName])) {
@@ -149,7 +152,7 @@ class ItemSeeder extends Seeder
                 }
             }
 
-            if (!empty($allergenIds)) {
+            if (! empty($allergenIds)) {
                 $item->allergens()->attach($allergenIds);
             }
 
@@ -157,7 +160,7 @@ class ItemSeeder extends Seeder
             $menuIds = (array) ($data['menu_id'] ?? []);
             $requiredAmount = $data['required_amount'] ?? [];
 
-            if (!empty($menuIds) && !is_null($requiredAmount)) {
+            if (! empty($menuIds) && ! is_null($requiredAmount)) {
                 $syncData = [];
                 foreach ($menuIds as $menuId) {
                     $syncData[$menuId] = ['required_amount' => $requiredAmount];

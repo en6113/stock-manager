@@ -42,21 +42,6 @@
                                 class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
                                 value="{{ old('ordered_date', \Carbon\Carbon::today()->format('Y-m-d')) }}">
                         </div>
-                        
-                        {{-- 発注数 --}}
-                        <div>
-                            <label for="ordered_qty" class="block text-xs font-medium text-gray-600 mb-1">
-                                発注数 <span class="text-red-500">*</span>
-                            </label>
-                            <div class="flex items-center gap-2">
-                                <input type="number" name="ordered_qty" id="ordered_qty" step="0.1" required
-                                    value="{{ old('ordered_qty') }}"
-                                    class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
-                                    placeholder="0.0">
-                                <span
-                                    class="text-sm text-gray-500 font-medium whitespace-nowrap">{{ $item->unit }}</span>
-                            </div>
-                        </div>
 
                         {{-- 発注業者 --}}
                         <div class="sm:col-span-2 md:col-span-1">
@@ -72,6 +57,28 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {{-- g換算自動計算用 --}}
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">g換算自動計算用</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="ordered_qty_input"
+                                    class="w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" step="1">
+                                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">{{ $item->unit }}</span>
+                            </div>
+                        </div>
+
+                        {{-- 発注量 --}}
+                        <div>
+                            <label for="ordered_qty" class="block text-xs font-medium text-gray-600 mb-1">発注量 <span class="text-red-500">*</span></label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="ordered_qty" id="ordered_qty" step="0.1" required value="{{ old('ordered_qty') }}"
+                                    class="gram-amount-input w-full rounded-lg border-gray-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm">
+                                <span class="text-sm text-gray-500 font-medium whitespace-nowrap">g</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,4 +134,19 @@
             </form>
         </div>
     </div>
+    <script>
+        // g換算自動計算用から発注量を計算して反映する
+        const gramPerUnit = {{ $item->gram_per_unit ?? 0 }};
+
+        document.getElementById('ordered_qty_input').addEventListener('input', function () {
+            const gramInput = document.getElementById('ordered_qty');
+            const amount = parseFloat(this.value);
+
+            if (!isNaN(gramPerUnit) && !isNaN(amount)) {
+                gramInput.value = Math.round(amount * gramPerUnit * 10) / 10;
+            } else {
+                gramInput.value = '';
+            }
+        });
+    </script>
 </x-app-layout>

@@ -23,6 +23,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">カテゴリ</label>
                     <select name="item_category" class="mt-1 block rounded border-gray-300 p-2 bg-white">
+                        <option value="">-- 選択してください --</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
@@ -42,10 +43,10 @@
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             <th class="px-6 py-3 w-60">食材名</th>
-                            <th class="px-6 py-3 w-40">適正在庫数(単位)</th>
-                            <th class="px-6 py-3 w-40">規格容量</th>
-                            <th class="px-6 py-3 w-40">保管場所</th>
                             <th class="px-6 py-3 w-40">カテゴリー</th>
+                            <th class="px-6 py-3 w-40">適正在庫数(購入単位)</th>
+                            <th class="px-6 py-3 w-40">1単位当たりのグラム数</th>
+                            <th class="px-6 py-3 w-40">保管場所</th>
                             <th class="px-6 py-3 w-40">アレルギー物質</th>
                             <th class="px-6 py-3 text-right">操作</th>
                         </tr>
@@ -59,22 +60,22 @@
                                     {{ $item->name }}
                                 </td>
 
+                                <td class="px-6 py-4 text-xs text-gray-600">
+                                    {{ $item->itemCategory->name ?? '未指定' }}
+                                </td>
+
                                 <td class="px-6 py-4 text-gray-600">
                                     {{ $item->target_stock_qty ?? 0 }}<span class="text-xs">{{ $item->unit }}</span>
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->capacity ?? '-' }}
+                                    {{ $item->gram_per_unit ?? '-' }}<span class="text-xs">g/{{ $item->unit }}</span>
                                 </td>
 
                                 <td class="px-6 py-4">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $item->storage_location?->colorClass() }}">
                                         {{ $item->storage_location?->label() }}
                                     </span>
-                                </td>
-
-                                <td class="px-6 py-4 text-xs text-gray-600">
-                                    {{ $item->itemCategory->name ?? '未指定' }}
                                 </td>
 
                                 <td class="px-6 py-4">

@@ -3,7 +3,8 @@
 <div class="container mx-auto p-6 max-w-4xl">
     <h1 class="text-2xl font-bold mb-6 text-gray-8xl">新規献立登録</h1>
 
-    <form action="{{ route('meal_plans.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('meal_plans.store') }}" method="POST" class="space-y-6"
+        data-menu-ingredients="{{ json_encode($menuIngredientsData ?? []) }}">
         @csrf
 
         <div class="bg-white p-6 rounded-lg shadow-sm border grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -20,32 +21,137 @@
             </div>
         </div>
 
-        @foreach($categories as $category)
-            <div class="bg-white p-6 rounded-lg shadow-sm border category-section" data-category-id="{{ $category->id }}">
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
+            data-category-id="{{ \App\Enums\DishCategory::Main->value }}">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">主菜</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Main->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Main) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
 
-                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{{ $category->name }}</h2>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
-
-                    <select name="menus[{{ $category->id }}][menu_id]"
-                        class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        onchange="loadMenuIngredients(this, {{ $category->id }})">
-                        <option value="">-- メニューを選択してください --</option>
-
-                        @foreach($menus->where('dish_category_id', $category->id) as $menu)
-                            <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
                         @endforeach
                     </select>
-                </div>
-
-                <div class="ingredient-adjustment-area hidden">
-                    <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
-                    <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
-                    </div>
+                    <button type="button"
+                        class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                        + 食材を追加
+                    </button>
                 </div>
             </div>
-        @endforeach
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
+            data-category-id="{{ \App\Enums\DishCategory::Side->value }}">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">副菜</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Side->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Side) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
+            data-category-id="{{ \App\Enums\DishCategory::Soup->value }}">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">汁もの</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Soup->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Soup) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
+            data-category-id="{{ \App\Enums\DishCategory::Other->value }}">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">その他</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Other->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Other) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div class="flex justify-end space-x-4">
             <a href="{{ route('meal_plans.index') }}"
@@ -56,81 +162,6 @@
     </form>
 </div>
 
-<script>
-    const menuIngredientsData = @json($menuIngredientsData ?? []);
-
-    // メニューが選択された時の処理
-    function loadMenuIngredients(selectElement, categoryId) {
-        const menuId = selectElement.value;
-        const section = selectElement.closest('.category-section');
-        const adjustmentArea = section.querySelector('.ingredient-adjustment-area');
-        const ingredientList = section.querySelector('.ingredient-list');
-
-        if (!menuId) {
-            adjustmentArea.classList.add('hidden');
-            ingredientList.innerHTML = '';
-            return;
-        }
-
-        adjustmentArea.classList.remove('hidden');
-        ingredientList.innerHTML = '';
-
-        const ingredients = menuIngredientsData[menuId] || [];
-
-        if (ingredients.length === 0) {
-            ingredientList.innerHTML = '<p class="text-xs text-gray-500">登録されている食材はありません。</p>';
-            return;
-        }
-
-        // 現在入力されている提供人数を取得
-        const servingsInput = document.querySelector('input[name="servings"]');
-        const currentServings = servingsInput ? parseInt(servingsInput.value) || 50 : 50;
-
-        ingredients.forEach((ing, index) => {
-            // ★ 計算：1人分の量(required_amount) × 提供人数
-            const totalAmount = ing.required_amount * currentServings;
-
-            const html = `
-                <div class="flex items-center justify-between bg-white p-2 rounded border text-sm">
-                    <div class="flex-1">
-                        <span class="font-medium text-gray-8xl">${ing.item_name}</span>
-                        <span class="text-xs text-red-500 ml-2">${ing.allergens ? '（アレルギー: ' + ing.allergens + '）' : ''}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="hidden" name="menus[${categoryId}][ingredients][${index}][item_id]" value="${ing.item_id}">
-
-                        <label class="text-xs text-gray-500">必要量:</label>
-                        <input type="number" 
-                                name="menus[${categoryId}][ingredients][${index}][required_amount]" 
-                                data-per-person="${ing.required_amount}" 
-                                value="${totalAmount}" 
-                                class="ingredient-amount-input w-20 rounded-md border-gray-300 text-right text-sm focus:ring-blue-500"
-                                min="0" step="0.1">
-                        <span class="text-gray-600 text-xs w-8">${ing.unit}</span>
-                    </div>
-                </div>
-            `;
-            ingredientList.insertAdjacentHTML('beforeend', html);
-        });
-    }
-
-    // ★ 新機能：提供人数（servings）が変更されたら、画面上の全食材の必要量を一斉に再計算する
-    document.addEventListener('DOMContentLoaded', function () {
-        const servingsInput = document.querySelector('input[name="servings"]');
-
-        if (servingsInput) {
-            servingsInput.addEventListener('input', function () {
-                const currentServings = parseInt(this.value) || 0;
-
-                // 画面上に生成されているすべての必要量inputをループ処理
-                document.querySelectorAll('.ingredient-amount-input').forEach(input => {
-                    const perPersonAmount = parseFloat(input.getAttribute('data-per-person')) || 0;
-                    // 新しい人数で掛け算して数値を更新
-                    input.value = (perPersonAmount * currentServings).toFixed(1);
-                });
-            });
-        }
-    });
-</script>
+@vite(['resources/js/pages/meal-plans/index.js'])
 
 </x-app-layout>

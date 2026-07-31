@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vendor>
+ * @extends Factory<Vendor>
  */
 class VendorFactory extends Factory
 {
@@ -22,7 +23,7 @@ class VendorFactory extends Factory
             'email' => fake()->email(),
             'phone_number' => fake()->phoneNumber(),
             'contact_person' => fake()->name(),
-            'product_category' => fake()->randomElement(['精肉店','精魚店','八百屋','総合卸業者']),
+            'product_category' => fake()->randomElement(['精肉店', '精魚店', '八百屋', '総合卸業者']),
         ];
     }
 }
