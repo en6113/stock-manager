@@ -35,17 +35,19 @@ class ExportCsvController extends Controller
             })
             ->get();
 
-        // 「日付」⇒「カテゴリーコード」の順にグルーピングして集計
+        // 「日付」⇒「カテゴリーコード」の順にグルーピングして集計（1人あたりの日別量に変換）
         $groupedData = $menuItems->groupBy(function ($menuItem) {
             return $menuItem->mealPlanMenu->mealPlan->date;
         })->map(function ($dateItem) use ($categoryCodes) {
             $groupedItem = $dateItem->groupBy('item.itemCategory.code');
+            $servings = $dateItem->first()->mealPlanMenu->servings;
 
             $row = [];
             foreach ($categoryCodes as $code) {
-                $row[$code] = $groupedItem->has($code)
+                $amount = $groupedItem->has($code)
                     ? $groupedItem->get($code)->sum('adjust_amount')
                     : 0;
+                $row[$code] = $servings > 0 ? round($amount / $servings, 1) : 0;
             }
 
             return $row;
