@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             MealPlanSeeder::class,
             MealPlanMenuSeeder::class,
             MealPlanMenuItemSeeder::class,
+            RealisticItemMenuSeeder::class,
+            RealisticMealPlanSeeder::class,
             OrderSeeder::class,
         ]);
     }

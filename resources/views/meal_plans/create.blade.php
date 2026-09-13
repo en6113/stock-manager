@@ -22,6 +22,39 @@
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
+            data-category-id="{{ \App\Enums\DishCategory::Staple->value }}">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">主食</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">メニューを選択</label>
+                <select name="menus[{{ \App\Enums\DishCategory::Staple->value }}][menu_id]"
+                    class="menu-select w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- メニューを選択してください --</option>
+                    @foreach($menus->where('dish_category', \App\Enums\DishCategory::Staple) as $menu)
+                        <option value="{{ $menu->id }}">{{ $menu->name }} ({{ $menu->calories }} kcal)</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="ingredient-adjustment-area hidden">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">食材・分量の微調整</h3>
+                <div class="bg-gray-50 rounded-lg p-4 space-y-3 ingredient-list">
+                </div>
+                <div class="mt-3 flex items-center gap-2 add-item-row">
+                    <select class="add-item-select flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                        <option value="">-- 追加する食材を選択 --</option>
+                        @foreach($items as $item)
+                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button"
+                        class="add-ingredient-btn bg-gray-600 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded whitespace-nowrap">
+                        + 食材を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border category-section"
             data-category-id="{{ \App\Enums\DishCategory::Main->value }}">
             <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">主菜</h2>
             <div class="mb-4">
